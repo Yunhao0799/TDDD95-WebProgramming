@@ -1,0 +1,51 @@
+body {
+  margin-left: auto;
+  margin-right: auto;
+  width: 600px;
+}
+
+.conteneur {
+  margin-top: 100px;
+  width: 600px;
+  height: 400px;
+  display: flex;
+}
+
+#logo {
+  width: 340px;
+  height: 400px;
+  border: 1px solid black;
+  margin-right: 10px;
+  float: left;
+  text-align: center;
+}
+
+#logo img {
+  width: 200px;
+  height: auto;
+}
+
+
+#login {
+  width: 250px;
+  border: 1px solid black;
+  margin-bottom: 6px;
+  text-align: justify;
+}
+
+#login input { display:inline-block; }
+#login label { display:inline-block; width:100px; }
+
+#signup {
+  width: 250px;
+  border: 1px solid black;
+  text-align: justify;
+
+}
+
+#signup input { display:inline-block; }
+#login label { display:inline-block; width:100px; }
+
+.connection {
+  float: right;
+}
