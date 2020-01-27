@@ -4,7 +4,7 @@ displayView = function(viewId){
   window.document.getElementById('content').innerHTML = viewContent
 };
 
-checkPassword = function(form) {
+checkSignup = function(form) {
 
   var goodLength = function(password) {
     if(password.value.length < 5) {
@@ -33,7 +33,15 @@ checkPassword = function(form) {
   }
 
   if(goodLength(form.password1) && samePwd(form.password1, form.password2)) {
-    return true
+    var account = {"email" : form.email.value, "password" : form.password.value, "firstname" : form.firstname.value, "familyname" : form.familyname.value, "gender" : form.gender.value, "city" : form.city.value, "country" : form.country.value};
+    serverstub.signUp(account);
+    console.log(serverstub.signUp(account));  //doesn't work, always error : User already exists
+    alert(serverstub.signUp(account).message);
+    if (serverstub.signUp(account).success==false) {
+      return false;
+    } else {
+      return true;
+    }
   } else {
     return false;
   };

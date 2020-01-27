@@ -24,20 +24,20 @@
          </div>
 
          <div id="signup">
-         <form id="sign" action="" method="post" onsubmit="return checkPassword(this);">
+         <form id="sign" action="" method="post" onsubmit="return checkSignup(this);">
             <h3>SignUp here:</h3>
-            <label>First name </label><input type="text" required/><br />
-            <label>Family name </label><input type="text" required/><br />
+            <label>First name </label><input type="text" name="firstname" required/><br />
+            <label>Family name </label><input type="text" name="familyname" required/><br />
             <label>Gender </label>
-            <select required>
+            <select name="gender" required>
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="other">Other</option>
             </select><br/>
-            <label>City </label><input type="text" required/><br />
-            <label>Country </label><input type="text" required/><br />
-            <label>Email </label><input type="email" required/><br />
-            <label>Password </label><input type="password" id="password1" required/><br />
+            <label>City </label><input type="text" name="city" required/><br />
+            <label>Country </label><input type="text" name="country" required/><br />
+            <label>Email </label><input type="email" name="email" required/><br />
+            <label>Password </label><input type="password" name="password" id="password1" required/><br />
             <label>Repeat it </label><input type="password" id="password2" required/><br /><br>
             <input type="submit" value="SignUp" />
         </form>
