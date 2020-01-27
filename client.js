@@ -34,12 +34,13 @@ checkSignup = function(form) {
 
   if(goodLength(form.password1) && samePwd(form.password1, form.password2)) {
     var account = {"email" : form.email.value, "password" : form.password.value, "firstname" : form.firstname.value, "familyname" : form.familyname.value, "gender" : form.gender.value, "city" : form.city.value, "country" : form.country.value};
-    serverstub.signUp(account);
-    console.log(serverstub.signUp(account));  //doesn't work, always error : User already exists
-    alert(serverstub.signUp(account).message);
-    if (serverstub.signUp(account).success==false) {
+    var account_signup_result = serverstub.signUp(account);
+    console.log(account_signup_result);  //doesn't work, always error : User already exists
+    alert(account_signup_result.message);
+    if (account_signup_result==false) {
       return false;
     } else {
+
       return true;
     }
   } else {
