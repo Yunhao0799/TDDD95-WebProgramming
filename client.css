@@ -5,6 +5,16 @@ body {
   background-color: rgb(198, 238, 247);
 }
 
+form {
+  margin-bottom: 1px;
+}
+
+h1 {
+  font-family: Bookman sans-serif;
+  font-weight: lighter;
+  font-size: 40px;
+}
+
 .conteneur {
   margin-top: 100px;
   width: 600px;
@@ -34,6 +44,7 @@ body {
   margin-bottom: 6px;
   text-align: justify;
   background-color: white;
+  padding: 2px;
 }
 
 #login input { display:inline-block; }
@@ -44,11 +55,33 @@ body {
   border: 1px solid black;
   text-align: justify;
   background-color: white;
+  padding: 2px;
 }
 
-#signup input { display:inline-block; }
-#login label { display:inline-block; width:100px; }
+#signup h3 {
+  margin-top: 10px;
+}
+
+/*.connection label {
+float: left;
+text-align: right;
+margin-bottom: 5px;
+}
+
+.connection input, select {
+float: right;
+text-align: left;
+}*/
 
 .connection {
   float: right;
+  height: 400px;
+}
+
+h5 {
+  font-size: 15px;
+  font-weight: lighter;
+  color: red;
+  margin-bottom: 0px;
+  margin-top: 2px;
 }
