@@ -95,3 +95,49 @@ function openTab(evt, tabName){
   evt.currentTarget.className += " highlighted";  //I don't understand this line
 };
 //The function hides all elements with the class name "tab" (display="none"), and displays the element with the given tab name (display="block");
+
+
+var changePswd = function(form){
+
+  var oldPswd = form.oldPswd.value;
+  var newPswd = form.newPswd.value;
+  var newPswd2 = form.newPswd2.value;
+  var token = this.localStorage.getItem("token");
+
+  var samePwd = function(password1, password2) {
+    if(password1 != password2) {
+      var box2 = document.getElementById("new2");
+      var errorSame = document.createElement('h5');
+      errorSame.setAttribute("id", "errorSame");
+      errorSame.textContent = "It is not the same password";
+      box2.insertAdjacentElement('afterend', errorSame);
+      return false;
+    } else {
+      return true;
+    }
+  }
+  if(samePwd(newPswd, newPswd2)) {
+    var changePswdResponse = serverstub.changePassword(token, oldPswd, newPswd);
+    console.log(changePswdResponse);
+    alert(changePswdResponse.message);
+    if(changePswdResponse.success==false) {
+      return false;
+    } else {
+      return true;
+    };
+  } else {
+    return false;
+  };
+};
+
+
+var logOut = function() {
+  var token = this.localStorage.getItem("token");
+  var signOutResponse = serverstub.signOut(token);
+  alert(signOutResponse.message);
+  if(signOutResponse.success==false) {
+    return false;
+  } else {
+    return displayView("welcomeview");
+  }
+};

@@ -50,8 +50,8 @@
     </script>
 
     <script type="text/view" id="profileview">
+      <br/>
       <h1>Hi ! You are signed in</h1>
-      <br>
       <div class="menu">
         <button class="tabsMenu highlighted" onclick="openTab(event, 'homeTab')">Home</button>
         <button class="tabsMenu" onclick="openTab(event, 'browseTab')">Browse</button>
@@ -68,7 +68,19 @@
       </div>
 
       <div id="accountTab" class="tab" style="display:none">
-        <p>Account details</p>
+        <br/>
+        //Maybe we can put this button outside of accountTab
+        <div class="logOut">
+          <button class="logOutButton" onclick="logOut()">Sign Out</button>
+        </div>
+        <br/>
+        <h2>Change your password:</h2>
+        <form id="changePassword" action="" method="post" onsubmit="return changePswd(this);">
+          <label>Old password: </label><input type="password" name="oldPswd" required /></br>
+          <label>New password: </label><input type="password" name="newPswd" required /></br>
+          <label>Repeat it: </label><input type="password" name="newPswd2" id="new2" required /></br></br>
+          <input type="submit" value="Change Password" />
+        </form>
       </div>
 
 
