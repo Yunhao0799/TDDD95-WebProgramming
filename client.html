@@ -16,9 +16,9 @@
 
           <div id="login">
             <br>
-            <form id="log" action="" method="post">
-              <label>Email </label><input type="email" placeholder="mail@mail.com" required /><br />
-              <label>Password </label><input type="password" required/><br /><br>
+            <form id="log" action="" method="post" onsubmit="return checkSignIn(this);">
+              <label>Email </label><input type="email" name="logMail" placeholder="mail@mail.com" required /><br />
+              <label>Password </label><input type="password" name="logPswd" required/><br /><br>
               <input type="submit" value="Login" />
             </form>
          </div>

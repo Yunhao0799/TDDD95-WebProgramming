@@ -1,3 +1,5 @@
+
+
 displayView = function(viewId){
   // the code required to display a view
   const viewContent = window.document.getElementById(viewId).innerText
@@ -5,7 +7,6 @@ displayView = function(viewId){
 };
 
 checkSignup = function(form) {
-
   var goodLength = function(password) {
     if(password.value.length < 5) {
       var box1 = document.getElementById("password1"); // !! need to erase the previous errors before
@@ -34,13 +35,13 @@ checkSignup = function(form) {
 
   if(goodLength(form.password1) && samePwd(form.password1, form.password2)) {
     var account = {"email" : form.email.value, "password" : form.password.value, "firstname" : form.firstname.value, "familyname" : form.familyname.value, "gender" : form.gender.value, "city" : form.city.value, "country" : form.country.value};
-    var account_signup_result = serverstub.signUp(account);
-    console.log(account_signup_result);  //doesn't work, always error : User already exists
-    alert(account_signup_result.message);
-    if (account_signup_result==false) {
+    let signUpResponse = serverstub.signUp(account);
+    console.log(signUpResponse);  //doesn't work, always error : User already exists
+    alert(signUpResponse.message);
+    if (signUpResponse==false) {
       return false;
     } else {
-
+      
       return true;
     }
   } else {
@@ -48,9 +49,30 @@ checkSignup = function(form) {
   };
 };
 
+checkSignIn = function(form){
 
+  let user, password;
+  // user = document.forms["log"]["logMail"].value;
+  // password = document.forms["log"]["logPswd"].value;
+  user = form.logMail.value;
+  user = form.logPswd.value;
+  var signInResponse = serverstub.signIn(user, password);
+  
+  console.log(signInResponse);
+
+  if(signInResponse.success == true){
+    localStorage.setItem("token", signInResponse.data);
+    return displayView("profileview");
+  }else{
+    alert(signInResponse.message);
+    return false;
+  }
+}
 
 window.onload = function(){
   //code that is executed as the page is loaded.
-  displayView('welcomeview')
+  if(this.localStorage.getItem("token") === null)
+    displayView('welcomeview')
+  else  
+    displayView("profileview")
 };
