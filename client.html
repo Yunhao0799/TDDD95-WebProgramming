@@ -1,5 +1,6 @@
 <html>
   <head>
+    <title>Twidder</title>
     <link href="client.css" type="text/css" rel="stylesheet">
     <script src="client.js" type="text/javascript"></script>
     <script src="serverstub.js" type="text/javascript"></script>
@@ -49,7 +50,28 @@
     </script>
 
     <script type="text/view" id="profileview">
-      <h1>Hi !</h1>
+      <h1>Hi ! You are signed in</h1>
+      <br>
+      <div class="menu">
+        <button class="tabsMenu highlighted" onclick="openTab("homeTab")">Home</button>
+        <button class="tabsMenu" onclick="openTab("browseTab")">Browse</button>
+        <button class="tabsMenu" onclick="openTab("accountTab")">Account</button>
+      </div>
+
+      
+      <div id="homeTab" class="tab">
+        <p>You are at the home</p>
+      </div>
+
+      <div id="browseTab" class="tab" style="display:none">
+        <p>Browse</p>
+      </div>
+
+      <div id="accountTab" class="tab" style="display:none">
+        <p>Account details</p>
+      </div>
+      
+
     </script>
 
   </head>

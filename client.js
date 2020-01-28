@@ -76,3 +76,19 @@ window.onload = function(){
   else  
     displayView("profileview")
 };
+
+
+function openTab(tabName){
+  let tabs = document.getElementsByClassName("tab");
+  console.log(x);
+  for(let i = 0; i < tabs.length; i++)
+    tabs[i].style.display = "none";
+
+  // let tabMenu = document.getElementsByClassName("tabsMenu");
+  // for(let i = 0; i < tabMenu.length; i++)
+  //   tabMenu[i].className = tabMenu[i].className.replace(" highlighted", "");
+
+  
+  document.getElementById(tabName).style.display = "block";
+  // evt.currentTarget.className += " highlighted";
+}
