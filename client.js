@@ -7,6 +7,7 @@ displayView = function(viewId){
 };
 
 checkSignup = function(form) {
+
   var goodLength = function(password) {
     if(password.value.length < 5) {
       var box1 = document.getElementById("password1"); // !! need to erase the previous errors before
@@ -36,12 +37,14 @@ checkSignup = function(form) {
   if(goodLength(form.password1) && samePwd(form.password1, form.password2)) {
     var account = {"email" : form.email.value, "password" : form.password.value, "firstname" : form.firstname.value, "familyname" : form.familyname.value, "gender" : form.gender.value, "city" : form.city.value, "country" : form.country.value};
     let signUpResponse = serverstub.signUp(account);
-    console.log(signUpResponse);  //doesn't work, always error : User already exists
+    console.log(signUpResponse);
     alert(signUpResponse.message);
     if (signUpResponse==false) {
       return false;
     } else {
-      
+      //serverstub.signIn(form.email.value, form.password.value);
+      //localStorage.setItem("token", signInResponse.data);
+      //return displayView("profileview");
       return true;
     }
   } else {
@@ -51,15 +54,12 @@ checkSignup = function(form) {
 
 checkSignIn = function(form){
 
-  let user, password;
   // user = document.forms["log"]["logMail"].value;
   // password = document.forms["log"]["logPswd"].value;
-  user = form.logMail.value;
-  user = form.logPswd.value;
+  let user = form.logMail.value;
+  let password = form.logPswd.value;
   var signInResponse = serverstub.signIn(user, password);
-  
   console.log(signInResponse);
-
   if(signInResponse.success == true){
     localStorage.setItem("token", signInResponse.data);
     return displayView("profileview");
@@ -67,28 +67,30 @@ checkSignIn = function(form){
     alert(signInResponse.message);
     return false;
   }
-}
+};
 
 window.onload = function(){
   //code that is executed as the page is loaded.
-  if(this.localStorage.getItem("token") === null)
-    displayView('welcomeview')
-  else  
-    displayView("profileview")
+  if(this.localStorage.getItem("token") === null) {
+    displayView('welcomeview');
+  } else {
+    displayView("profileview");
+  }
 };
 
 
 function openTab(tabName){
   let tabs = document.getElementsByClassName("tab");
   console.log(x);
-  for(let i = 0; i < tabs.length; i++)
+  for(let i = 0; i < tabs.length; i++) {
     tabs[i].style.display = "none";
+  };
 
   // let tabMenu = document.getElementsByClassName("tabsMenu");
   // for(let i = 0; i < tabMenu.length; i++)
   //   tabMenu[i].className = tabMenu[i].className.replace(" highlighted", "");
 
-  
+
   document.getElementById(tabName).style.display = "block";
   // evt.currentTarget.className += " highlighted";
 }
