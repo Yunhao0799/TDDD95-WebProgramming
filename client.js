@@ -79,18 +79,19 @@ window.onload = function(){
 };
 
 
-function openTab(tabName){
-  let tabs = document.getElementsByClassName("tab");
-  console.log(x);
-  for(let i = 0; i < tabs.length; i++) {
+function openTab(evt, tabName){
+  var i;
+  var tabs = document.getElementsByClassName("tab");
+  console.log(tabs);
+  for(i = 0; i < tabs.length; i++) {
     tabs[i].style.display = "none";
-  };
-
-  // let tabMenu = document.getElementsByClassName("tabsMenu");
-  // for(let i = 0; i < tabMenu.length; i++)
-  //   tabMenu[i].className = tabMenu[i].className.replace(" highlighted", "");
-
-
+  }
+  var tabsMenu = document.getElementsByClassName("tabsMenu");
+  for(i = 0; i < tabsMenu.length; i++) {
+     tabsMenu[i].className = tabsMenu[i].className.replace(" highlighted", "");
+  }
   document.getElementById(tabName).style.display = "block";
-  // evt.currentTarget.className += " highlighted";
-}
+  document.getElementById
+  evt.currentTarget.className += " highlighted";  //I don't understand this line
+};
+//The function hides all elements with the class name "tab" (display="none"), and displays the element with the given tab name (display="block");

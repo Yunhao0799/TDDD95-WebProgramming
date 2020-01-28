@@ -53,12 +53,12 @@
       <h1>Hi ! You are signed in</h1>
       <br>
       <div class="menu">
-        <button class="tabsMenu highlighted" onclick="openTab("homeTab")">Home</button>
-        <button class="tabsMenu" onclick="openTab("browseTab")">Browse</button>
-        <button class="tabsMenu" onclick="openTab("accountTab")">Account</button>
+        <button class="tabsMenu highlighted" onclick="openTab(event, 'homeTab')">Home</button>
+        <button class="tabsMenu" onclick="openTab(event, 'browseTab')">Browse</button>
+        <button class="tabsMenu" onclick="openTab(event, 'accountTab')">Account</button>
       </div>
 
-      
+
       <div id="homeTab" class="tab">
         <p>You are at the home</p>
       </div>
@@ -70,7 +70,7 @@
       <div id="accountTab" class="tab" style="display:none">
         <p>Account details</p>
       </div>
-      
+
 
     </script>
 

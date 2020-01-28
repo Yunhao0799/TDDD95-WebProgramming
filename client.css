@@ -85,3 +85,7 @@ h5 {
   margin-bottom: 0px;
   margin-top: 2px;
 }
+
+.highlighted {
+  background-color: red;
+}
