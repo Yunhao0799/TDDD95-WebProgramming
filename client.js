@@ -174,12 +174,40 @@ var postmessage = function(form) {
 
 var displayOwnMessages = function(token) {
   var listMessage = serverstub.getUserMessagesByToken(token).data;
-  console.log(listMessage);
   for(i in listMessage) {
     var writer = listMessage[i].writer;
     var content = listMessage[i].content;
     var aux = document.createElement("li");
     aux.innerHTML = writer + ": " + content;
     document.getElementById("wallMessage").appendChild(aux);
+  }
+};
+
+var searchUser = function(form) {
+  var email = form.user.value;
+  var token = this.localStorage.getItem("token");
+  var userDataResponse = serverstub.getUserDataByEmail(token, email);
+  var userMessagesResponse = serverstub.getUserMessagesByEmail(token, email);
+  if(userDataResponse.success == false || userMessagesResponse.success == false) {
+    alert(userDataResponse.message);
+    return false;
+  } else {
+    document.getElementById("resultSearch").style.display="block";
+    var infoUser = userDataResponse.data;
+    var messageUser = userMessagesResponse.data;
+    for(i in infoUser) {
+      var al = infoUser[i];
+      var aux = document.createElement("li");
+      aux.innerHTML = i + ": " + al;
+      document.getElementById("userInfo").appendChild(aux);
+    }
+    for(i in messageUser) {
+      var writer = messageUser[i].writer;
+      var content = messageUser[i].content;
+      var aux = document.createElement("li");
+      aux.innerHTML = writer + ": " + content;
+      document.getElementById("wallMessageUser").appendChild(aux);
+    }
+    return false;
   }
 }

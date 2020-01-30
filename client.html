@@ -85,7 +85,20 @@
       </div>
 
       <div id="browseTab" class="tab" style="display:none">
-        <p>Browse</p>
+        <h2>Search other users:</h2>
+        <form id="searchuser" action="" method="post" onsubmit="return searchUser(this);">
+          <label>Users email: </label><input type="email" name="user" required/><br />
+          <input type="submit" value="Search" />
+        </form>
+        <div id="resultSearch" style="display:none">
+          <h2>User personal information:</h2>
+          <ul id="userInfo"></ul>
+          <div id="wall">
+            </br>
+            <h2>His/Her wall:</h2>
+            <ul id="wallMessageUser"></ul>
+          </div>
+        </div>
       </div>
 
       <div id="accountTab" class="tab" style="display:none">
