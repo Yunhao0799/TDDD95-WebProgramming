@@ -75,8 +75,8 @@ window.onload = function(){
     displayView('welcomeview');
   } else {
     var token = this.localStorage.getItem("token");
-    //
     displayView("profileview");
+    infoPerso(token);
   }
 };
 
@@ -146,5 +146,10 @@ var logOut = function() {
 
 var infoPerso = function(token){
   var info = serverstub.getUserDataByToken(token).data;
-  var infoBox = createElement();
+  for(i in info) {
+    var al = info[i];
+    var aux = document.createElement("li");
+    aux.innerHTML = i + ": " + al;
+    document.getElementById("personalInfo").appendChild(aux);
+  }
 }
