@@ -61,7 +61,7 @@ checkSignIn = function(form){
   var signInResponse = serverstub.signIn(user, password);
   console.log(signInResponse);
   if(signInResponse.success == true){
-    localStorage.setItem("token", signInResponse.data);
+    localStorage.setItem("token", signInResponse.data);  //problem here
     return displayView("profileview");
   }else{
     alert(signInResponse.message);
@@ -77,6 +77,7 @@ window.onload = function(){
     var token = this.localStorage.getItem("token");
     displayView("profileview");
     infoPerso(token);
+    displayOwnMessages(token);
   }
 };
 
@@ -84,7 +85,6 @@ window.onload = function(){
 function openTab(evt, tabName){
   var i;
   var tabs = document.getElementsByClassName("tab");
-  console.log(tabs);
   for(i = 0; i < tabs.length; i++) {
     tabs[i].style.display = "none";
   }
@@ -151,5 +151,35 @@ var infoPerso = function(token){
     var aux = document.createElement("li");
     aux.innerHTML = i + ": " + al;
     document.getElementById("personalInfo").appendChild(aux);
+  }
+};
+
+var postmessage = function(form) {
+  var token = this.localStorage.getItem("token");
+  if(form.dest.value == ""){
+    var dest = null;
+  } else {
+    var dest = form.dest.value;
+  }
+  console.log(dest);
+  var message = form.message.value;
+  var postMessageResponse = serverstub.postMessage(token, message, dest);
+  alert(postMessageResponse.message);
+  if(postMessageResponse.success==false) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+var displayOwnMessages = function(token) {
+  var listMessage = serverstub.getUserMessagesByToken(token).data;
+  console.log(listMessage);
+  for(i in listMessage) {
+    var writer = listMessage[i].writer;
+    var content = listMessage[i].content;
+    var aux = document.createElement("li");
+    aux.innerHTML = writer + ": " + content;
+    document.getElementById("wallMessage").appendChild(aux);
   }
 }

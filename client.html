@@ -66,11 +66,22 @@
 
       <div id="homeTab" class="tab">
         <h2>Your personal information:</h2>
-        <ul id="personalInfo"></ul>
+        <ul id="personalInfo"></ul></br>
         <div id="message">
-          <form id="postMess" action="" method="post" onsubmit="return postMessage();">
-            <textarea></textarea>
+          <h2>Post a message:</h2>
+          <form id="postMess" action="" method="post" onsubmit="return postmessage(this);">
+            <label>To: </label><input type="email" name="dest"/><br />
+            <textarea name="message"></textarea></br>
+            <input type="submit" value="Post Message" />
           </form>
+        </div>
+        <div id="wall">
+        </br>
+          <h2>Your wall:</h2>
+          <button onclick="window.location.reload()">Refresh</button>
+          </br>
+          <ul id="wallMessage"></ul>
+        </div>
       </div>
 
       <div id="browseTab" class="tab" style="display:none">
@@ -83,7 +94,7 @@
           <label>Old password: </label><input type="password" name="oldPswd" required /></br>
           <label>New password: </label><input type="password" name="newPswd" required /></br>
           <label>Repeat it: </label><input type="password" name="newPswd2" id="new2" required /></br></br>
-          <input type="submit" value="Change Password" />
+          <input type="submit" value="Change Password"/>
         </form>
       </div>
 
