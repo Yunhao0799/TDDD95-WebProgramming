@@ -74,6 +74,8 @@ window.onload = function(){
   if(this.localStorage.getItem("token") === null) {
     displayView('welcomeview');
   } else {
+    var token = this.localStorage.getItem("token");
+    //
     displayView("profileview");
   }
 };
@@ -141,3 +143,8 @@ var logOut = function() {
     return displayView("welcomeview");
   }
 };
+
+var infoPerso = function(token){
+  var info = serverstub.getUserDataByToken(token).data;
+  var infoBox = createElement();
+}

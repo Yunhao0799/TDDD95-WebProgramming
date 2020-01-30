@@ -52,6 +52,11 @@
     <script type="text/view" id="profileview">
       <br/>
       <h1>Hi ! You are signed in</h1>
+      <br/>
+      <div class="logOut">
+        <button class="logOutButton" onclick="logOut()">Sign Out</button>
+      </div>
+      <br/>
       <div class="menu">
         <button class="tabsMenu highlighted" onclick="openTab(event, 'homeTab')">Home</button>
         <button class="tabsMenu" onclick="openTab(event, 'browseTab')">Browse</button>
@@ -60,7 +65,8 @@
 
 
       <div id="homeTab" class="tab">
-        <p>You are at the home</p>
+        <h2>Your personal information:</h2>
+        <div id="personalInfo"></div>
       </div>
 
       <div id="browseTab" class="tab" style="display:none">
@@ -68,12 +74,6 @@
       </div>
 
       <div id="accountTab" class="tab" style="display:none">
-        <br/>
-        //Maybe we can put this button outside of accountTab
-        <div class="logOut">
-          <button class="logOutButton" onclick="logOut()">Sign Out</button>
-        </div>
-        <br/>
         <h2>Change your password:</h2>
         <form id="changePassword" action="" method="post" onsubmit="return changePswd(this);">
           <label>Old password: </label><input type="password" name="oldPswd" required /></br>
