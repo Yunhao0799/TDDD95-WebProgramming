@@ -82,7 +82,8 @@ window.onload = function(){
 };
 
 
-function openTab(evt, tabName){
+function openTab(evt, tabName, element){
+
   var i;
   var tabs = document.getElementsByClassName("tab");
   for(i = 0; i < tabs.length; i++) {
@@ -90,11 +91,20 @@ function openTab(evt, tabName){
   }
   var tabsMenu = document.getElementsByClassName("tabsMenu");
   for(i = 0; i < tabsMenu.length; i++) {
+     tabsMenu[i].style.backgroundColor = "";
      tabsMenu[i].className = tabsMenu[i].className.replace(" highlighted", "");
+
   }
   document.getElementById(tabName).style.display = "block";
   document.getElementById
-  evt.currentTarget.className += " highlighted";  //I don't understand this line
+
+  var tabElement = document.getElementById(tabName);
+  var computedStyles = window.getComputedStyle(tabElement);
+  var thisTabColor = computedStyles.getPropertyValue('background-color');
+  document.body.style.backgroundColor = thisTabColor;
+
+  element.style.backgroundColor = thisTabColor;
+
 };
 //The function hides all elements with the class name "tab" (display="none"), and displays the element with the given tab name (display="block");
 

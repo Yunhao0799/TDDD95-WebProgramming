@@ -58,11 +58,13 @@
       </div>
       <br/>
       <div class="menu">
-        <button class="tabsMenu highlighted" onclick="openTab(event, 'homeTab')">Home</button>
-        <button class="tabsMenu" onclick="openTab(event, 'browseTab')">Browse</button>
-        <button class="tabsMenu" onclick="openTab(event, 'accountTab')">Account</button>
+        <button class="tabsMenu highlighted" onclick="openTab(event, 'homeTab', this)">Home</button>
+        <button class="tabsMenu" onclick="openTab(event, 'browseTab', this)">Browse</button>
+        <button class="tabsMenu" onclick="openTab(event, 'accountTab' ,this)">Account</button>
       </div>
 
+      <br>
+      <br>
 
       <div id="homeTab" class="tab">
         <h2>Your personal information:</h2>
