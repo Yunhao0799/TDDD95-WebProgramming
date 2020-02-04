@@ -31,9 +31,13 @@ def disconnect_db():
         g.db = None
 
 def check_user_password(email, password):
-    cursor = get_db().execute('select password from users where email like (?)', [email])
-    cursor = str(cursor)
-    if cursor == password:
+    cursor = get_db().execute('select password from users where email like ?', [email])
+    rows = cursor.fetchall()
+    cursor.close()
+    result = []
+    for index in range(len(rows)):
+        result.append(rows[index][0])
+    if result[0] == password:
         return True
 
 
