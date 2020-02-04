@@ -100,11 +100,6 @@ function openTab(evt, tabName, element){
 
   var tabElement = document.getElementById(tabName);
   var computedStyles = window.getComputedStyle(tabElement);
-  var thisTabColor = computedStyles.getPropertyValue('background-color');
-  document.body.style.backgroundColor = thisTabColor;
-
-  element.style.backgroundColor = thisTabColor;
-
 };
 //The function hides all elements with the class name "tab" (display="none"), and displays the element with the given tab name (display="block");
 
