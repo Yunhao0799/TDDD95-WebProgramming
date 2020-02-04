@@ -93,13 +93,9 @@ function openTab(evt, tabName, element){
   for(i = 0; i < tabsMenu.length; i++) {
      tabsMenu[i].style.backgroundColor = "";
      tabsMenu[i].className = tabsMenu[i].className.replace(" highlighted", "");
-
   }
   document.getElementById(tabName).style.display = "block";
-  document.getElementById
-
-  var tabElement = document.getElementById(tabName);
-  var computedStyles = window.getComputedStyle(tabElement);
+  evt.currentTarget.className += " highlighted";
 };
 //The function hides all elements with the class name "tab" (display="none"), and displays the element with the given tab name (display="block");
 
@@ -154,7 +150,7 @@ var infoPerso = function(token){
   for(i in info) {
     var al = info[i];
     var aux = document.createElement("li");
-    aux.innerHTML = i + ": " + al;
+    aux.innerHTML = i + ":  " + al;
     document.getElementById("personalInfo").appendChild(aux);
   }
 };
@@ -183,7 +179,7 @@ var displayOwnMessages = function(token) {
     var writer = listMessage[i].writer;
     var content = listMessage[i].content;
     var aux = document.createElement("li");
-    aux.innerHTML = writer + ": " + content;
+    aux.innerHTML = writer + ":  " + content;
     document.getElementById("wallMessage").appendChild(aux);
   }
 };
@@ -203,14 +199,14 @@ var searchUser = function(form) {
     for(i in infoUser) {
       var al = infoUser[i];
       var aux = document.createElement("li");
-      aux.innerHTML = i + ": " + al;
+      aux.innerHTML = i + ":  " + al;
       document.getElementById("userInfo").appendChild(aux);
     }
     for(i in messageUser) {
       var writer = messageUser[i].writer;
       var content = messageUser[i].content;
       var aux = document.createElement("li");
-      aux.innerHTML = writer + ": " + content;
+      aux.innerHTML = writer + ":  " + content;
       document.getElementById("wallMessageUser").appendChild(aux);
     }
     return false;
