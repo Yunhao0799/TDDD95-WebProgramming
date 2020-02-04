@@ -1,0 +1,8 @@
+--------------------------------------------------------------------------------
+--                            schema.sql                                      --
+-- This file shall contain the SQL script used to initialize the database.    --
+-- database_helper.py or SQLite3 front-end will use this file to create       --
+-- all the tables and insert the default data. This file should be completed  --
+-- and executed before implementing and running any of the server side        --
+-- procedures.                                                                --
+--------------------------------------------------------------------------------
