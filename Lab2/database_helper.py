@@ -11,8 +11,8 @@
 
 
 import sqlite3
-from Flask import g
-import jsonify
+from flask import Flask, g, request
+
 
 DATABASE_URI = "database.db"
 

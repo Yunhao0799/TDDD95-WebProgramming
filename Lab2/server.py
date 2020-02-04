@@ -7,11 +7,12 @@
 from flask import Flask
 import database_helper
 import json
-import jsonify
-
 
 
 app = Flask(__name__)
+
+app.debug = True
+
 
 @app.route('/hello')
 def hello_world():
