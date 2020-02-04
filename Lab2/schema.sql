@@ -6,3 +6,6 @@
 -- and executed before implementing and running any of the server side        --
 -- procedures.                                                                --
 --------------------------------------------------------------------------------
+
+create table users(email varchar(30), password varchar(30), firstname varchar(20), familyname varchar(50), gender varchar(10), city varchar(30), country varchar(30), primary key(email));
+create table message(INTEGER PRIMARY KEY , sender varchar(30), receiver varchar(30), message varchar(500));
