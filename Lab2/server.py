@@ -19,10 +19,13 @@ def hello_world():
     return 'Hello, World!'
 
 
-@app.route('/sign_in')
+@app.route('/sign_in/<email>/<password>', methods = ['GET'])
 def sign_in(email, password):
-    boolean_success = database_helper.check_user(email, password)
-    return "You are at sign in"
+    boolean_success = database_helper.check_user_password(email, password)
+    if boolean_success == True:
+        return "You are at sign in"
+    else:
+        return "Wrong password"
 
 
 
