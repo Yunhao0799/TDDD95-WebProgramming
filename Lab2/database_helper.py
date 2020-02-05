@@ -42,3 +42,11 @@ def check_user_password(email, password):
 
 
     return False
+
+def save_new_user(email, password, firstname, familyname, gender, city, country):
+    try:
+        get_db().execute("insert into users values(?,?,?,?,?,?,?)", [email, password, firstname, familyname, gender, city, country])
+        get_db().commit()
+        return True
+    except:
+        return False
