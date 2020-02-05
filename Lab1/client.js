@@ -10,7 +10,7 @@ checkSignup = function(form) {
 
   var goodLength = function(password) {
     if(password.value.length < 5) {
-      var box1 = document.getElementById("password1"); // !! need to erase the previous errors before
+      var box1 = document.getElementById("password1");
       var errorLength = document.createElement('h5');
       errorLength.setAttribute("id", "errorLength");
       errorLength.textContent = "Password too short. You need at least 5 characters.";
@@ -38,10 +38,14 @@ checkSignup = function(form) {
     var account = {"email" : form.email.value, "password" : form.password.value, "firstname" : form.firstname.value, "familyname" : form.familyname.value, "gender" : form.gender.value, "city" : form.city.value, "country" : form.country.value};
     let signUpResponse = serverstub.signUp(account);
     console.log(signUpResponse);
-    alert(signUpResponse.message);
-    if (signUpResponse==false) {
+    if (signUpResponse.success==false) {
+      var box2 = document.getElementById("password2");
+      var error = document.createElement('h5');
+      error.textContent = signUpResponse.message;
+      box2.insertAdjacentElement('afterend', error);
       return false;
     } else {
+      alert(signUpResponse.message);
       //serverstub.signIn(form.email.value, form.password.value);
       //localStorage.setItem("token", signInResponse.data);
       //return displayView("profileview");
@@ -54,17 +58,18 @@ checkSignup = function(form) {
 
 checkSignIn = function(form){
 
-  // user = document.forms["log"]["logMail"].value;
-  // password = document.forms["log"]["logPswd"].value;
   let user = form.logMail.value;
   let password = form.logPswd.value;
   var signInResponse = serverstub.signIn(user, password);
   console.log(signInResponse);
   if(signInResponse.success == true){
-    localStorage.setItem("token", signInResponse.data);  //problem here
+    localStorage.setItem("token", signInResponse.data);
     return displayView("profileview");
   }else{
-    alert(signInResponse.message);
+    var box = document.getElementById("pass");
+    var error = document.createElement('h5');
+    error.textContent = signInResponse.message;
+    box.insertAdjacentElement('afterend', error);
     return false;
   }
 };
@@ -119,13 +124,32 @@ var changePswd = function(form){
       return true;
     }
   }
-  if(samePwd(newPswd, newPswd2)) {
-    var changePswdResponse = serverstub.changePassword(token, oldPswd, newPswd);
-    console.log(changePswdResponse);
-    alert(changePswdResponse.message);
-    if(changePswdResponse.success==false) {
+
+  var goodLength = function(password) {
+    if(password.length < 5) {
+      var box1 = document.getElementById("new2");
+      var errorLength = document.createElement('h5');
+      errorLength.setAttribute("id", "errorLength");
+      errorLength.textContent = "Password too short. You need at least 5 characters.";
+      box1.insertAdjacentElement('afterend', errorLength);
       return false;
     } else {
+      return true;
+    }
+  };
+
+  if(samePwd(newPswd, newPswd2) && goodLength(newPswd)) {
+    var changePswdResponse = serverstub.changePassword(token, oldPswd, newPswd);
+    console.log(changePswdResponse);
+    if(changePswdResponse.success==false) {
+      var box2 = document.getElementById("new2");
+      var errorSame = document.createElement('h5');
+      errorSame.setAttribute("id", "errorSame");
+      errorSame.textContent = changePswdResponse.message;
+      box2.insertAdjacentElement('afterend', errorSame);
+      return false;
+    } else {
+      alert(changePswdResponse.message);  //keep it
       return true;
     };
   } else {
@@ -137,10 +161,11 @@ var changePswd = function(form){
 var logOut = function() {
   var token = this.localStorage.getItem("token");
   var signOutResponse = serverstub.signOut(token);
-  alert(signOutResponse.message);
   if(signOutResponse.success==false) {
+    alert(signOutResponse.message);  //keep it
     return false;
   } else {
+    localStorage.removeItem('token');
     return displayView("welcomeview");
   }
 };
@@ -165,10 +190,14 @@ var postmessage = function(form) {
   console.log(dest);
   var message = form.message.value;
   var postMessageResponse = serverstub.postMessage(token, message, dest);
-  alert(postMessageResponse.message);
   if(postMessageResponse.success==false) {
+    var box2 = document.getElementById("mailPost");
+    var post = document.createElement('h5');
+    post.textContent = postMessageResponse.message;
+    box2.insertAdjacentElement('afterend', post);
     return false;
   } else {
+    alert(postMessageResponse.message); //keep it
     return true;
   }
 };
@@ -190,7 +219,10 @@ var searchUser = function(form) {
   var userDataResponse = serverstub.getUserDataByEmail(token, email);
   var userMessagesResponse = serverstub.getUserMessagesByEmail(token, email);
   if(userDataResponse.success == false || userMessagesResponse.success == false) {
-    alert(userDataResponse.message);
+    var box2 = document.getElementById("search");
+    var post = document.createElement('h5');
+    post.textContent = userDataResponse.message;
+    box2.insertAdjacentElement('afterend', post);
     return false;
   } else {
     document.getElementById("resultSearch").style.display="block";
