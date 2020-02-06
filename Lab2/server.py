@@ -27,9 +27,13 @@ def sign_in(email, password):
     boolean_success = database_helper.check_user_password(email, password)
     if boolean_success == True:
         token = secrets.token_hex(16)
-        return token
+        token_saved = database_helper.link_token_to_user(email, token)
+        if token_saved:
+            return token
+        else:
+            return "Error generating and saving the token(maybe you are already signed in)"
     else:
-        return "Wrong password"
+        return "Wrong user or wrong password"
 
 @app.route('/sign_up/<email>/<password>/<firstname>/<familyname>/<gender>/<city>/<country>', methods = ['POST'])
 def sign_up(email, password, firstname, familyname, gender, city, country):
@@ -48,6 +52,18 @@ def sign_up(email, password, firstname, familyname, gender, city, country):
 
     else:
         return  "Invalid email"
+
+@app.route('/sign_out/<token>', methods = ['POST'])
+def sign_out(token):
+    succesful_sign_out = database_helper.sign_out(token)
+    if succesful_sign_out:
+        return "Succesfully signed out"
+    else:
+        return "Something went wrong when trying to sign out"
+
+
+
+
 
 
 

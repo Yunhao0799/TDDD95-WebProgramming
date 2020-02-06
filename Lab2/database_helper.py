@@ -43,9 +43,27 @@ def check_user_password(email, password):
 
     return False
 
+
+def link_token_to_user(email, token):
+    try:
+        get_db().execute("insert into loggedUser values(?,?)", [email, token])
+        get_db().commit()
+        return True
+    except:
+        return False
+
 def save_new_user(email, password, firstname, familyname, gender, city, country):
     try:
         get_db().execute("insert into users values(?,?,?,?,?,?,?)", [email, password, firstname, familyname, gender, city, country])
+        get_db().commit()
+        return True
+    except:
+        return False
+
+
+def sign_out(token):
+    try:
+        get_db().execute("delete from loggedUser where token like ?", [token])
         get_db().commit()
         return True
     except:
