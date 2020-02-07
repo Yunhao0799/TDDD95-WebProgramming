@@ -23,7 +23,7 @@ def hello_world():
     return 'Hello, World!'
 
 
-@app.route('/sign_in/<email>/<password>', methods = ['GET'])
+@app.route('/sign_in/<email>/<password', methods = ['GET'])
 def sign_in(email, password):
     boolean_success = database_helper.check_user_password(email, password)
     if boolean_success == True:
@@ -62,10 +62,11 @@ def sign_out(token):
     else:
         return jsonify({'success' : False, 'message' : "Something went wrong when trying to sign out"})
 
-# @app.route('/change_password/<token>/<old_password>/<new_password>', methods = ['POST'])
-# def change_password(token, old_password, new_password):
+@app.route('/change_password/<token>/<old_password>/<new_password>', methods = ['POST'])
+def change_password(token, old_password, new_password):
+    return "Not implemented"
 
-@app.route('/get/<token>', methods = ['GET'])
+@app.route('/get/data/by_token/<token>', methods = ['GET'])
 def get_user_data_by_token(token = None):
     if token != None:
         result = database_helper.get_user_data_by_token(token)
@@ -77,8 +78,29 @@ def get_user_data_by_token(token = None):
     else:
         return jsonify({'success' : False, 'message' : "Token has to be provided"})
 
+@app.route('/get/data/by_email/<email>', methods = ['GET'])
+def get_user_data_by_email(email = None):
+    if email != None:
+        result = database_helper.get_user_data_by_email(email)
+        if not result:
+            return jsonify({'success' : False, 'message' : "No data with requested email"})
+        return jsonify(result)
 
 
+    else:
+        return jsonify({'success' : False, 'message' : "Email has to be provided"})
+
+@app.route('/get/messages/by_token/<token>', methods = ['GET'])
+def get_user_messages_by_token(token):
+    return "Not implemented"
+
+@app.route('/get/messages/by_email/<email>', methods = ['GET'])
+def get_user_messages_by_email(current_user_token, email):
+    # Retrive current user messages with the user with given email
+    return "Not implemented"
+
+def post_message(message):
+    return "Not implemented"
 
 
 
