@@ -68,3 +68,14 @@ def sign_out(token):
         return True
     except:
         return False
+
+def get_user_data_by_token(token):
+    cursor = get_db().execute('select * from users where email like (select email from loggedUser where token like ?)', [token])
+    rows = cursor.fetchall()
+    cursor.close()
+    data = []
+    for index in range(len(rows)):
+        data.append({'email' : rows[index][0], 'firstname' : rows[index][2], 'familyname' : rows[index][3], 'gender' : rows[index][4], 'city' : rows[index][5], 'country' : rows[index][6]})
+        
+
+    return data
