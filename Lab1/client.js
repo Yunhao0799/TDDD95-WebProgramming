@@ -51,7 +51,7 @@ checkSignup = function(form) {
     }
   };
   if(goodLength(form.password1) && samePwd(form.password1, form.password2)) {
-    var account = {"email" : form.email.value, "password" : form.password.value, "firstname" : form.firstname.value, "familyname" : form.familyname.value, "gender" : form.gender.value, "city" : form.city.value, "country" : form.country.value};
+    var account = {"email" : form.email.value, "password" : form.password1.value, "firstname" : form.firstname.value, "familyname" : form.familyname.value, "gender" : form.gender.value, "city" : form.city.value, "country" : form.country.value};
     let signUpResponse = serverstub.signUp(account);
     console.log(signUpResponse);
     if (signUpResponse.success==false) {
@@ -60,7 +60,7 @@ checkSignup = function(form) {
       document.getElementById("wrongLength1").style.display = "none";
       document.getElementById("wrongSame1").style.display = "none";
       var error = document.createElement('h5');
-      error.innerHTML = changePswdResponse.message;
+      error.innerHTML = signUpResponse.message;
       document.getElementById("errorSignup").appendChild(error);
       return false;
     } else {
@@ -68,6 +68,9 @@ checkSignup = function(form) {
       document.getElementById("errorSignup").style.display = "none";
       document.getElementById("wrongLength1").style.display = "none";
       document.getElementById("okSignup").style.display = "block";
+      var ok = document.createElement('h4');
+      ok.innerHTML = signUpResponse.message;
+      document.getElementById("okSignup").appendChild(ok);
       document.forms['sign'].reset();
       return false;
     }
@@ -86,10 +89,10 @@ checkSignIn = function(form){
     localStorage.setItem("token", signInResponse.data);
     return displayView("profileview");
   }else{
-    var box = document.getElementById("pass");
+    document.getElementById("errorSignin").style.display = "block";
     var error = document.createElement('h5');
-    error.textContent = signInResponse.message;
-    box.insertAdjacentElement('afterend', error);
+    error.innerHTML = signInResponse.message;
+    document.getElementById("errorSignin").appendChild(error);
     return false;
   }
 };
@@ -196,29 +199,49 @@ var infoPerso = function(token){
   }
 };
 
-var postmessage = function(form) {
+var postOwnMessage = function(form) {
   var token = this.localStorage.getItem("token");
-  if(form.dest.value == null){
-    var dest = null;
+  //if(form.dest.value == null){
+  var dest = null;
+    //var dest = this.localStorage.getItem("dest");
+  var message = form.message.value;
+  var postMessageResponse = serverstub.postMessage(token, message, dest);
+  if(postMessageResponse.success==false) {
+    document.getElementById("errorPost").style.display = "block";
+    var error = document.createElement('h5');
+    error.innerHTML = postMessageResponse.message;
+    document.getElementById("errorPost").appendChild(error);
+    return false;
   } else {
-    var dest = this.localStorage.getItem("dest");
+    displayOwnMessages(token);
+    document.forms['postMessOwn'].reset();
+    return false;
   }
+};
+
+var postmessageUser = function(form) {
+  var token = this.localStorage.getItem("token");
+  var dest = searchUser(document.forms["searchuser"]).dest;
   console.log(dest);
   var message = form.message.value;
   var postMessageResponse = serverstub.postMessage(token, message, dest);
   if(postMessageResponse.success==false) {
-    var box2 = document.getElementById("mailPost");
-    var post = document.createElement('h5');
-    post.textContent = postMessageResponse.message;
-    box2.insertAdjacentElement('afterend', post);
+    document.getElementById("errorPost").style.display = "block";
+    var error = document.createElement('h5');
+    error.innerHTML = postMessageResponse.message;
+    document.getElementById("errorPost").appendChild(error);
     return false;
   } else {
-    return true;
+    searchUser(document.forms["searchuser"]);
+    document.forms['postMessUser'].reset();
+    return false;
   }
 };
 
+
 var displayOwnMessages = function(token) {
   var listMessage = serverstub.getUserMessagesByToken(token).data;
+  document.getElementById('wallMessage').innerHTML = " ";
   for(i in listMessage) {
     var writer = listMessage[i].writer;
     var content = listMessage[i].content;
@@ -230,18 +253,23 @@ var displayOwnMessages = function(token) {
 
 var searchUser = function(form) {
   var email = form.user.value;
-  this.localStorage.setItem("dest", email);
+  //this.localStorage.setItem("dest", email);
   var token = this.localStorage.getItem("token");
   var userDataResponse = serverstub.getUserDataByEmail(token, email);
   var userMessagesResponse = serverstub.getUserMessagesByEmail(token, email);
   if(userDataResponse.success == false || userMessagesResponse.success == false) {
-    var box2 = document.getElementById("search");
+    document.getElementById('errorSearch').innerHTML = " ";
+    document.getElementById("resultSearch").style.display="none";
+    document.getElementById("errorSearch").style.display="block";
     var post = document.createElement('h5');
-    post.textContent = userDataResponse.message;
-    box2.insertAdjacentElement('afterend', post);
+    post.innerHTML = userDataResponse.message;
+    document.getElementById("errorSearch").appendChild(post);
     return false;
   } else {
     document.getElementById("resultSearch").style.display="block";
+    document.getElementById("errorSearch").style.display="none";
+    document.getElementById('userInfo').innerHTML = " ";
+    document.getElementById('wallMessageUser').innerHTML = " ";
     var infoUser = userDataResponse.data;
     var messageUser = userMessagesResponse.data;
     for(i in infoUser) {
@@ -257,6 +285,18 @@ var searchUser = function(form) {
       aux.innerHTML = writer + ":  " + content;
       document.getElementById("wallMessageUser").appendChild(aux);
     }
-    return false;
+    return {
+      dest:email,
+      result:false,
+    }
   }
-}
+};
+
+var refreshOwnWall = function() {
+  var token = this.localStorage.getItem("token");
+  displayOwnMessages(token);
+};
+
+var refreshUserWall = function() {
+  searchUser(document.forms["searchuser"]);
+};
