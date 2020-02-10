@@ -4,12 +4,13 @@
 # using Python and Flask                                                       #
 ################################################################################
 
-from flask import Flask
+from flask import Flask, request
 import database_helper
 import json
 from flask import jsonify
 # module secrets used for generate token
 import secrets
+
 
 
 
@@ -23,8 +24,12 @@ def hello_world():
     return 'Hello, World!'
 
 
-@app.route('/sign_in/<email>/<password', methods = ['GET'])
-def sign_in(email, password):
+@app.route('/sign_in', methods = ['GET'])
+def sign_in():
+    data = request.get_json()
+    # print (email)
+    email = data['email']
+    password = data['password']
     boolean_success = database_helper.check_user_password(email, password)
     if boolean_success == True:
         token = secrets.token_hex(16)
@@ -35,13 +40,15 @@ def sign_in(email, password):
             return jsonify({'success' : False, 'message' : "Error generating and saving the token(maybe you are already signed in)"})
     else:
         return jsonify({'success' : False, 'message' : "Wrong user or wrong password"})
+    return None
 
-@app.route('/sign_up/<email>/<password>/<firstname>/<familyname>/<gender>/<city>/<country>', methods = ['POST'])
-def sign_up(email, password, firstname, familyname, gender, city, country):
-    if "@" in email:
-        if len(password) >= 5:
-            if firstname != None and familyname != None and gender != None and city != None and country != None:
-                output_msg = database_helper.save_new_user(email, password, firstname, familyname, gender, city, country)
+@app.route('/sign_up', methods = ['POST'])
+def sign_up():
+    data = request.get_json()
+    if "@" in data['email']:
+        if len(data['password']) >= 5:
+            if data['firstname'] != None and data['familyname'] != None and data['gender'] != None and data['city'] != None and data['country'] != None:
+                output_msg = database_helper.save_new_user(data['email'], data['password'], data['firstname'], data['familyname'], data['gender'], data['city'], data['country'])
                 if output_msg:
                     return jsonify({'success' : True, 'message' : "Data saved succesfully"})
                 else:
@@ -54,8 +61,10 @@ def sign_up(email, password, firstname, familyname, gender, city, country):
     else:
         return  jsonify({'success' : True, 'message' : "Invalid email"})
 
-@app.route('/sign_out/<token>', methods = ['POST'])
-def sign_out(token):
+@app.route('/sign_out', methods = ['POST'])
+def sign_out():
+    data = request.get_json()
+    token = data['token']
     succesful_sign_out = database_helper.sign_out(token)
     if succesful_sign_out:
         return jsonify({'success' : True, 'message' : "Succesfully signed out"})
@@ -66,8 +75,10 @@ def sign_out(token):
 def change_password(token, old_password, new_password):
     return "Not implemented"
 
-@app.route('/get/data/by_token/<token>', methods = ['GET'])
-def get_user_data_by_token(token = None):
+@app.route('/get/data/by_token', methods = ['GET'])
+def get_user_data_by_token():
+    data = request.get_json()
+    token = data['token']
     if token != None:
         result = database_helper.get_user_data_by_token(token)
         if not result:
@@ -75,11 +86,15 @@ def get_user_data_by_token(token = None):
         return jsonify(result)
 
 
+
+
     else:
         return jsonify({'success' : False, 'message' : "Token has to be provided"})
 
-@app.route('/get/data/by_email/<email>', methods = ['GET'])
-def get_user_data_by_email(email = None):
+@app.route('/get/data/by_email', methods = ['GET'])
+def get_user_data_by_email():
+    data = request.get_json()
+    email = data['email']
     if email != None:
         result = database_helper.get_user_data_by_email(email)
         if not result:
@@ -90,17 +105,62 @@ def get_user_data_by_email(email = None):
     else:
         return jsonify({'success' : False, 'message' : "Email has to be provided"})
 
-@app.route('/get/messages/by_token/<token>', methods = ['GET'])
-def get_user_messages_by_token(token):
-    return "Not implemented"
+@app.route('/get/messages/by_token', methods = ['GET'])
+def get_user_messages_by_token():
+    data = request.get_json()
+    token = data['token']
+    if token != None:
+        result = database_helper.get_user_messages_by_token(token)
+        if not result:
+            return jsonify({'success' : False, 'message' : "No message with requested token"})
+        return jsonify(result)
 
-@app.route('/get/messages/by_email/<email>', methods = ['GET'])
-def get_user_messages_by_email(current_user_token, email):
+
+    else:
+        return jsonify({'success' : False, 'message' : "Token has to be provided"})
+
+@app.route('/get/messages/by_email', methods = ['GET'])
+def get_user_messages_by_email():
     # Retrive current user messages with the user with given email
-    return "Not implemented"
+    data = request.get_json()
+    token = data['token']
+    email = data['email']
+    if token != None and email != None:
+        result = database_helper.get_user_messages_by_email(token, email)
+        if not result:
+            return jsonify({'success' : False, 'message' : "No message with requested email"})
+        return jsonify(result)
 
-def post_message(message):
-    return "Not implemented"
+
+    else:
+        return jsonify({'success' : False, 'message' : "Token and email have to be provided"})
+
+
+@app.route('/post_message', methods = ['POST'])
+def post_message():
+    data = request.get_json()
+    current_user_token = data['token']
+    message = data['message']
+    dest_email = data['email']
+
+    if current_user_token != None and dest_email != None:
+        sender_mail = database_helper.get_email_by_token(current_user_token)
+        sender_mail = sender_mail[0]
+
+        if database_helper.check_if_email_exists(sender_mail) and database_helper.check_if_email_exists(dest_email):
+            success_post = database_helper.post_message(sender_mail, message, dest_email)
+            if success_post:
+                return jsonify({'success' : True, 'message' : "Message posted succesfully"})
+            else:
+                return jsonify({'success' : False, 'message' : "Something went wrong posting the message"})
+
+        else:
+                return jsonify({'success' : False, 'message' : "Provided token or email do not exist"})
+
+    else:
+        return jsonify({'success' : False, 'message' : "Token and destination email cannot be void"})
+
+
 
 
 

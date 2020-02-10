@@ -39,9 +39,8 @@ def check_user_password(email, password):
         result.append(rows[index][0])
     if result[0] == password:
         return True
-
-
-    return False
+    else:
+        return False
 
 
 def link_token_to_user(email, token):
@@ -90,3 +89,58 @@ def get_user_data_by_email(email):
 
 
     return data
+
+def get_user_messages_by_token(token):
+    cursor = get_db().execute('select message from message where sender like (select email from loggedUser where token like ?)', [token])
+    rows = cursor.fetchall()
+    cursor.close()
+    data = []
+    for index in range(len(rows)):
+        data.append({'requested_message' : rows[index][0]})
+
+    return data
+
+
+def get_user_messages_by_email(current_user_token, email):
+    cursor = get_db().execute('select message from message where sender like (select email from loggedUser where token like ?) and receiver like ?', [current_user_token, email])
+    rows = cursor.fetchall()
+    cursor.close()
+    data = []
+    for index in range(len(rows)):
+        data.append({'requested_message' : rows[index][0]})
+
+    return data
+
+
+def get_email_by_token(token):
+        cursor = get_db().execute('select email from users where email like (select email from loggedUser where token like ?)', [token])
+        rows = cursor.fetchall()
+        cursor.close()
+        data = []
+        for index in range(len(rows)):
+            data.append(rows[index][0])
+
+
+        return data
+
+def post_message(sender_mail, message, dest_email):
+        try:
+
+            get_db().execute("insert into message (sender, receiver, message) values(?,?,?)", [sender_mail, dest_email, message])
+            get_db().commit()
+            return True
+        except:
+            return False
+
+
+def check_if_email_exists(email):
+    cursor = get_db().execute('select email from users where email like ?', [email])
+    rows = cursor.fetchall()
+    cursor.close()
+    data = []
+    for index in range(len(rows)):
+        data.append(rows[index][0])
+
+    if not data:
+        return False
+    return True
