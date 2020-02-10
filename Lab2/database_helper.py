@@ -144,3 +144,11 @@ def check_if_email_exists(email):
     if not data:
         return False
     return True
+
+def change_password(email, new_password):
+    try:
+        get_db().execute("update users set password=? where email=?;", [new_password, email])
+        get_db().commit()
+        return True
+    except:
+        return False
