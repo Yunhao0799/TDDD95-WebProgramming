@@ -4,13 +4,14 @@
 # using Python and Flask                                                       #
 ################################################################################
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 import database_helper
 import json
 from flask import jsonify
 # module secrets used for generate token
 import secrets
-
+#from geventwebsocket.handler import WebSocketHandler
+#from gevent.pywsgi import WSGIServer
 
 
 
@@ -19,9 +20,10 @@ app = Flask(__name__)
 app.debug = True
 
 
-@app.route('/hello')
-def hello_world():
-    return 'Hello, World!'
+@app.route('/')
+def root():
+    return app.send_static_file('client.html')
+
 
 
 @app.route('/sign_in', methods = ['GET'])

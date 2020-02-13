@@ -52,6 +52,7 @@ checkSignup = function(form) {
   };
   if(goodLength(form.password1) && samePwd(form.password1, form.password2)) {
     var account = {"email" : form.email.value, "password" : form.password1.value, "firstname" : form.firstname.value, "familyname" : form.familyname.value, "gender" : form.gender.value, "city" : form.city.value, "country" : form.country.value};
+    var req = new XMLHttpRequest();
     let signUpResponse = serverstub.signUp(account);
     console.log(signUpResponse);
     if (signUpResponse.success==false) {
@@ -83,6 +84,7 @@ checkSignIn = function(form){
 
   let user = form.logMail.value;
   let password = form.logPswd.value;
+  var req = new XMLHttpRequest();
   var signInResponse = serverstub.signIn(user, password);
   console.log(signInResponse);
   if(signInResponse.success == true){
@@ -152,6 +154,7 @@ var changePswd = function(form){
   };
 
   if(samePwd(newPswd, newPswd2) && goodLength(newPswd)) {
+    var req = new XMLHttpRequest();
     var changePswdResponse = serverstub.changePassword(token, oldPswd, newPswd);
     console.log(changePswdResponse);
     if(changePswdResponse.success==false) {
@@ -179,6 +182,7 @@ var changePswd = function(form){
 
 var logOut = function() {
   var token = this.localStorage.getItem("token");
+  var req = new XMLHttpRequest();
   var signOutResponse = serverstub.signOut(token);
   if(signOutResponse.success==false) {
     document.getElementById("variousMess").style.display = "block";
@@ -190,6 +194,7 @@ var logOut = function() {
 };
 
 var infoPerso = function(token){
+  var req = new XMLHttpRequest();
   var info = serverstub.getUserDataByToken(token).data;
   for(i in info) {
     var al = info[i];
@@ -205,6 +210,7 @@ var postOwnMessage = function(form) {
   var dest = null;
     //var dest = this.localStorage.getItem("dest");
   var message = form.message.value;
+  var req = new XMLHttpRequest();
   var postMessageResponse = serverstub.postMessage(token, message, dest);
   if(postMessageResponse.success==false) {
     document.getElementById("errorPost").style.display = "block";
@@ -224,6 +230,7 @@ var postmessageUser = function(form) {
   var dest = searchUser(document.forms["searchuser"]).dest;
   console.log(dest);
   var message = form.message.value;
+  var req = new XMLHttpRequest();
   var postMessageResponse = serverstub.postMessage(token, message, dest);
   if(postMessageResponse.success==false) {
     document.getElementById("errorPost").style.display = "block";
@@ -240,6 +247,7 @@ var postmessageUser = function(form) {
 
 
 var displayOwnMessages = function(token) {
+  var req = new XMLHttpRequest();
   var listMessage = serverstub.getUserMessagesByToken(token).data;
   document.getElementById('wallMessage').innerHTML = " ";
   for(i in listMessage) {
@@ -255,6 +263,8 @@ var searchUser = function(form) {
   var email = form.user.value;
   //this.localStorage.setItem("dest", email);
   var token = this.localStorage.getItem("token");
+  var req1 = new XMLHttpRequest();
+  var req2 = new XMLHttpRequest();
   var userDataResponse = serverstub.getUserDataByEmail(token, email);
   var userMessagesResponse = serverstub.getUserMessagesByEmail(token, email);
   if(userDataResponse.success == false || userMessagesResponse.success == false) {
