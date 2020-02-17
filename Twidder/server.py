@@ -26,11 +26,11 @@ def root():
 
 
 
-@app.route('/sign_in', methods = ['POST'])
+@app.route('/sign_in', methods = ['PUT']) #ok
 def sign_in():
     data = request.get_json()
-    print (data)
     email = data['email']
+    print(email)
     password = data['password']
     boolean_success = database_helper.check_user_password(email, password)
     if boolean_success == True:
@@ -44,7 +44,7 @@ def sign_in():
         return jsonify({'success' : False, 'message' : "Wrong user or wrong password"})
     return None
 
-@app.route('/sign_up', methods = ['POST'])
+@app.route('/sign_up', methods = ['POST']) #you forgot the second password and check if same
 def sign_up():
     data = request.get_json()
     if "@" in data['email']:
@@ -59,37 +59,37 @@ def sign_up():
                 return jsonify({'success' : False, 'message' : "Fields cannot be empty"})
         else:
             return jsonify({'success' : False, 'message' : "Password too short"})
-
     else:
         return  jsonify({'success' : True, 'message' : "Invalid email"})
 
-@app.route('/sign_out', methods = ['POST'])
-def sign_out():
+
+@app.route('/sign_out', methods = ['POST']) #ok
+def sign_out(token = None):
     data = request.get_json()
     token = data['token']
+    if token==None:
+        return jsonify({'success' : False, 'message' : "You are not signed in."})
     succesful_sign_out = database_helper.sign_out(token)
     if succesful_sign_out:
         return jsonify({'success' : True, 'message' : "Succesfully signed out"})
     else:
         return jsonify({'success' : False, 'message' : "Something went wrong when trying to sign out"})
 
+
 @app.route('/change_password/<token>/<old_password>/<new_password>', methods = ['POST'])
 def change_password(token, old_password, new_password):
     return "Not implemented"
 
-@app.route('/get/data/by_token', methods = ['GET'])
+@app.route('/get/data/by_token', methods = ['POST'])
 def get_user_data_by_token():
     data = request.get_json()
     token = data['token']
     if token != None:
         result = database_helper.get_user_data_by_token(token)
+        print(result)
         if not result:
             return jsonify({'success' : False, 'message' : "No data with requested token"})
         return jsonify(result)
-
-
-
-
     else:
         return jsonify({'success' : False, 'message' : "Token has to be provided"})
 

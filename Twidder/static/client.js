@@ -21,7 +21,6 @@ window.onload = function(){
 
 
 checkSignup = function(form) {
-
   var goodLength = function(password) {
     if(password.value.length < 5) {
       document.getElementById("errorSignup").style.display = "none";
@@ -80,22 +79,23 @@ checkSignup = function(form) {
   };
 };
 
-checkSignIn = function(form){
 
-  let user = form.logMail.value;
-  let password = form.logPswd.value;
-  var data = {'email' : user, 'password' : password};
+checkSignIn = function(form){ //ok
+
+  var user = form.logMail.value;
+  var password = form.logPswd.value;
+  var data = {"email" : user, "password" : password};
   console.log(data);
   var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", '/sign_in', true);
-
+  xhttp.open("PUT", '/sign_in', true);
   xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      var signInResponse = JSON.parse(this.responseText);
+    var signInResponse = JSON.parse(this.responseText);
+    if (signInResponse.success == true) {
       console.log(signInResponse);
       localStorage.setItem("token", signInResponse.message);
       return displayView("profileview");
     } else {
+      document.getElementById('errorSignin').innerHTML = " ";
       document.getElementById("errorSignin").style.display = "block";
       var error = document.createElement('h5');
       error.innerHTML = signInResponse.message;
@@ -105,16 +105,9 @@ checkSignIn = function(form){
   };
   xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
   xhttp.send(JSON.stringify(data));
-
-
-
-
-  //var signInResponse = serverstub.signIn(user, password);
-  //console.log(signInResponse);
-
 };
 
-function openTab(evt, tabName, element){
+function openTab(evt, tabName, element){ //ok
   var i;
   var tabs = document.getElementsByClassName("tab");
   for(i = 0; i < tabs.length; i++) {
@@ -195,28 +188,53 @@ var changePswd = function(form){
 };
 
 
-var logOut = function() {
+var logOut = function() {  //a problem to fix... but ok
   var token = this.localStorage.getItem("token");
-  var req = new XMLHttpRequest();
-  var signOutResponse = serverstub.signOut(token);
-  if(signOutResponse.success==false) {
-    document.getElementById("variousMess").style.display = "block";
-    return false;
-  } else {
-    localStorage.removeItem('token');
-    return displayView("welcomeview");
-  }
+  var data = {"token" : token};
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", '/sign_out', true);
+  xhttp.onreadystatechange = function() {
+    var signOutResponse = JSON.parse(this.responseText);
+    if (signOutResponse.success==true) {
+      console.log(signOutResponse);
+      localStorage.removeItem('token');    //We keep this line ??
+      return displayView("welcomeview");
+    } else {
+      document.getElementById("variousMess").innerHTML = " ";
+      document.getElementById("variousMess").style.display = "block";
+      return false;
+    }
+  };
+  xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+  xhttp.send(JSON.stringify(data));
 };
 
+
 var infoPerso = function(token){
-  var req = new XMLHttpRequest();
-  var info = serverstub.getUserDataByToken(token).data;
-  for(i in info) {
-    var al = info[i];
-    var aux = document.createElement("li");
-    aux.innerHTML = i + ":  " + al;
-    document.getElementById("personalInfo").appendChild(aux);
-  }
+  var data = {"token" : token};
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", '/get/data/by_token', true);
+  xhttp.onreadystatechange = function() {
+    var infoResponse = JSON.parse(this.responseText);
+    console.log(infoResponse);
+    if (infoResponse.success==true) {
+      var info = infoResponse; //mal affiché
+      console.log(info);
+      document.getElementById("personalInfo").innerHTML = " ";
+      for(i = 1; i < info.length; i++) {
+        var al = info[i];
+        var aux = document.createElement("li");
+        aux.innerHTML = i + ":  " + al;
+        document.getElementById("personalInfo").appendChild(aux);
+      }
+    } else {
+      var error = document.createElement('h5');
+      error.innerHTML = infoResponse.message;
+      document.getElementById("personalInfo").appendChild(error);
+    }
+   };
+  xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+  xhttp.send(JSON.stringify(data));
 };
 
 var postOwnMessage = function(form) {
