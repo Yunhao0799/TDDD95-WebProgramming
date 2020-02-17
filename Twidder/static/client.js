@@ -216,18 +216,19 @@ var infoPerso = function(token){
   xhttp.open("POST", '/get/data/by_token', true);
   xhttp.onreadystatechange = function() {
     var infoResponse = JSON.parse(this.responseText);
-    console.log(infoResponse);
-    if (infoResponse.success==true) {
-      var info = infoResponse; //mal affiché
-      console.log(info);
+    var info = infoResponse[0];
+    console.log(info);
+    if (this.readystate == 4 && this.status == 200) {
       document.getElementById("personalInfo").innerHTML = " ";
-      for(i = 1; i < info.length; i++) {
-        var al = info[i];
+      for(i = 1; i < infoResponse.length; i++) {
+        var al = infoResponse[i];
+        console.log(al);
         var aux = document.createElement("li");
         aux.innerHTML = i + ":  " + al;
         document.getElementById("personalInfo").appendChild(aux);
       }
     } else {
+      document.getElementById("personalInfo").innerHTML = " ";
       var error = document.createElement('h5');
       error.innerHTML = infoResponse.message;
       document.getElementById("personalInfo").appendChild(error);
