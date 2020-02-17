@@ -26,10 +26,10 @@ def root():
 
 
 
-@app.route('/sign_in', methods = ['GET'])
+@app.route('/sign_in', methods = ['POST'])
 def sign_in():
     data = request.get_json()
-    # print (email)
+    print (data)
     email = data['email']
     password = data['password']
     boolean_success = database_helper.check_user_password(email, password)
@@ -37,7 +37,7 @@ def sign_in():
         token = secrets.token_hex(16)
         token_saved = database_helper.link_token_to_user(email, token)
         if token_saved:
-            return token
+            return jsonify({'success' : True, 'message' : token})
         else:
             return jsonify({'success' : False, 'message' : "Error generating and saving the token(maybe you are already signed in)"})
     else:

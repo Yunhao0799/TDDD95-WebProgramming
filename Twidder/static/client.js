@@ -84,19 +84,34 @@ checkSignIn = function(form){
 
   let user = form.logMail.value;
   let password = form.logPswd.value;
-  var req = new XMLHttpRequest();
-  var signInResponse = serverstub.signIn(user, password);
-  console.log(signInResponse);
-  if(signInResponse.success == true){
-    localStorage.setItem("token", signInResponse.data);
-    return displayView("profileview");
-  }else{
-    document.getElementById("errorSignin").style.display = "block";
-    var error = document.createElement('h5');
-    error.innerHTML = signInResponse.message;
-    document.getElementById("errorSignin").appendChild(error);
-    return false;
-  }
+  var data = {'email' : user, 'password' : password};
+  console.log(data);
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", '/sign_in', true);
+
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var signInResponse = JSON.parse(this.responseText);
+      console.log(signInResponse);
+      localStorage.setItem("token", signInResponse.message);
+      return displayView("profileview");
+    } else {
+      document.getElementById("errorSignin").style.display = "block";
+      var error = document.createElement('h5');
+      error.innerHTML = signInResponse.message;
+      document.getElementById("errorSignin").appendChild(error);
+      return false;
+    }
+  };
+  xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+  xhttp.send(JSON.stringify(data));
+
+
+
+
+  //var signInResponse = serverstub.signIn(user, password);
+  //console.log(signInResponse);
+
 };
 
 function openTab(evt, tabName, element){
