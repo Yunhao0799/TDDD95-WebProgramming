@@ -76,9 +76,25 @@ def sign_out(token = None):
         return jsonify({'success' : False, 'message' : "Something went wrong when trying to sign out"})
 
 
-@app.route('/change_password/<token>/<old_password>/<new_password>', methods = ['POST'])
-def change_password(token, old_password, new_password):
-    return "Not implemented"
+@app.route('/change_password', methods = ['POST'])
+def change_password():
+    data = request.get_json()
+    token = data['token']
+    old_password = data['old_password']
+    new_password = data['new_password']
+    if token != None:
+        email = database_helper.get_email_by_token(token)
+        email = email[0]
+        exists = database_helper.check_user_password(email, old_password)
+        password_changed = database_helper.change_password(email, new_password)
+        if password_changed and exists:
+            return jsonify({'Success' : True, 'message' : "Password succesfully changed"})
+        else if password_changed and not exists:
+            return jsonify({'Success' : False, 'message' : "Wrong passeword"})
+        else:
+            return jsonify({'Success' : False, 'message' : "Something went wrong changing the password"})
+    else:
+        return jsonify({'Success' : False, 'message' : "You are not signed in."})
 
 @app.route('/get/data/by_token', methods = ['POST'])  #ok
 def get_user_data_by_token():

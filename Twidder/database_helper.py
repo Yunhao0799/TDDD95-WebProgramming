@@ -144,7 +144,16 @@ def check_if_email_exists(email):
     data = []
     for index in range(len(rows)):
         data.append(rows[index][0])
-
-    if not data:
+    if data==[]:
         return False
-    return True
+    else:
+        return True
+        
+
+def change_password(email, new_password):
+    try:
+        get_db().execute("update users set password=? where email=?;", [new_password, email])
+        get_db().commit()
+        return True
+    except:
+        return False

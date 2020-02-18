@@ -146,7 +146,6 @@ var changePswd = function(form){
       return true;
     }
   }
-
   var goodLength = function(password) {
     if(password.length < 5) {
       document.getElementById("errorNewPass").style.display = "none";
@@ -163,7 +162,7 @@ var changePswd = function(form){
   };
 
   if(samePwd(newPswd, newPswd2) && goodLength(newPswd)) {
-    var req = new XMLHttpRequest();
+    var xhttp = new XMLHttpRequest();
     var changePswdResponse = serverstub.changePassword(token, oldPswd, newPswd);
     console.log(changePswdResponse);
     if(changePswdResponse.success==false) {
@@ -199,7 +198,7 @@ var logOut = function() {  //a problem to fix... but ok
     var signOutResponse = JSON.parse(this.responseText);
     if (signOutResponse.success==true) {
       console.log(signOutResponse);
-      localStorage.removeItem('token');    //We keep this line ??
+      localStorage.removeItem('token');
       return displayView("welcomeview");
     } else {
       document.getElementById("variousMess").innerHTML = " ";
