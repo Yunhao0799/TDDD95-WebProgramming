@@ -80,34 +80,35 @@ def sign_out(token = None):
 def change_password(token, old_password, new_password):
     return "Not implemented"
 
-@app.route('/get/data/by_token', methods = ['POST'])
+@app.route('/get/data/by_token', methods = ['POST'])  #ok
 def get_user_data_by_token():
     data = request.get_json()
     token = data['token']
     if token != None:
         result = database_helper.get_user_data_by_token(token)
-        print(result)
         if not result:
             return jsonify({'success' : False, 'message' : "No data with requested token"})
         return jsonify(result)
     else:
         return jsonify({'success' : False, 'message' : "Token has to be provided"})
 
-@app.route('/get/data/by_email', methods = ['GET'])
+@app.route('/get/data/by_email', methods = ['POST'])
 def get_user_data_by_email():
     data = request.get_json()
+    token = data['token']
     email = data['email']
-    if email != None:
-        result = database_helper.get_user_data_by_email(email)
-        if not result:
-            return jsonify({'success' : False, 'message' : "No data with requested email"})
-        return jsonify(result)
-
-
+    if token!= None:
+        if email != None:
+            result = database_helper.get_user_data_by_email(email)
+            if not result:
+                return jsonify({'success' : False, 'message' : "No data with requested email"})
+            return jsonify(result)
+        else:
+            return jsonify({'success' : False, 'message' : "Email has to be provided"})
     else:
-        return jsonify({'success' : False, 'message' : "Email has to be provided"})
+        return jsonify({'success' : False, 'message' : "You are not signed in."})
 
-@app.route('/get/messages/by_token', methods = ['GET'])
+@app.route('/get/messages/by_token', methods = ['POST']) #ok
 def get_user_messages_by_token():
     data = request.get_json()
     token = data['token']
@@ -116,38 +117,41 @@ def get_user_messages_by_token():
         if not result:
             return jsonify({'success' : False, 'message' : "No message with requested token"})
         return jsonify(result)
-
-
     else:
         return jsonify({'success' : False, 'message' : "Token has to be provided"})
 
-@app.route('/get/messages/by_email', methods = ['GET'])
+@app.route('/get/messages/by_email', methods = ['POST'])
 def get_user_messages_by_email():
     # Retrive current user messages with the user with given email
     data = request.get_json()
     token = data['token']
     email = data['email']
-    if token != None and email != None:
-        result = database_helper.get_user_messages_by_email(token, email)
-        if not result:
-            return jsonify({'success' : False, 'message' : "No message with requested email"})
-        return jsonify(result)
-
-
+    if token != None:
+        if email != None:
+            result = database_helper.get_user_messages_by_email(email)
+            if not result:
+                return jsonify({'success' : False, 'message' : "No message with requested email"})
+            return jsonify(result)
+        else:
+            return jsonify({'success' : False, 'message' : "Email has to be provided"})
     else:
-        return jsonify({'success' : False, 'message' : "Token and email have to be provided"})
+        return jsonify({'success' : False, 'message' : "You are not signed in."})
 
 
-@app.route('/post_message', methods = ['POST'])
+@app.route('/post_message', methods = ['POST'])  #ok
 def post_message():
     data = request.get_json()
     current_user_token = data['token']
     message = data['message']
     dest_email = data['email']
 
+    sender_mail = database_helper.get_email_by_token(current_user_token)
+    sender_mail = sender_mail[0]
+
+    if dest_email==None:
+        dest_email = sender_mail
+
     if current_user_token != None and dest_email != None:
-        sender_mail = database_helper.get_email_by_token(current_user_token)
-        sender_mail = sender_mail[0]
 
         if database_helper.check_if_email_exists(sender_mail) and database_helper.check_if_email_exists(dest_email):
             success_post = database_helper.post_message(sender_mail, message, dest_email)

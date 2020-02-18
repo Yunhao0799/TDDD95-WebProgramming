@@ -85,15 +85,15 @@ checkSignIn = function(form){ //ok
   var user = form.logMail.value;
   var password = form.logPswd.value;
   var data = {"email" : user, "password" : password};
-  console.log(data);
   var xhttp = new XMLHttpRequest();
   xhttp.open("PUT", '/sign_in', true);
   xhttp.onreadystatechange = function() {
+    if(this.readyState == 4 && this.status == 200) {
     var signInResponse = JSON.parse(this.responseText);
     if (signInResponse.success == true) {
       console.log(signInResponse);
       localStorage.setItem("token", signInResponse.message);
-      return displayView("profileview");
+      return window.onload();
     } else {
       document.getElementById('errorSignin').innerHTML = " ";
       document.getElementById("errorSignin").style.display = "block";
@@ -102,6 +102,7 @@ checkSignIn = function(form){ //ok
       document.getElementById("errorSignin").appendChild(error);
       return false;
     }
+  }
   };
   xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
   xhttp.send(JSON.stringify(data));
@@ -194,6 +195,7 @@ var logOut = function() {  //a problem to fix... but ok
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/sign_out', true);
   xhttp.onreadystatechange = function() {
+    if(this.readyState == 4 && this.status == 200) {
     var signOutResponse = JSON.parse(this.responseText);
     if (signOutResponse.success==true) {
       console.log(signOutResponse);
@@ -204,136 +206,182 @@ var logOut = function() {  //a problem to fix... but ok
       document.getElementById("variousMess").style.display = "block";
       return false;
     }
+  }
   };
   xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
   xhttp.send(JSON.stringify(data));
 };
 
 
-var infoPerso = function(token){
+var infoPerso = function(token){  //ok
   var data = {"token" : token};
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/get/data/by_token', true);
   xhttp.onreadystatechange = function() {
-    var infoResponse = JSON.parse(this.responseText);
-    var info = infoResponse[0];
-    console.log(info);
-    if (this.readystate == 4 && this.status == 200) {
-      document.getElementById("personalInfo").innerHTML = " ";
-      for(i = 1; i < infoResponse.length; i++) {
-        var al = infoResponse[i];
-        console.log(al);
-        var aux = document.createElement("li");
-        aux.innerHTML = i + ":  " + al;
-        document.getElementById("personalInfo").appendChild(aux);
+    if (this.readyState == 4 && this.status == 200) {
+      var infoResponse = JSON.parse(this.responseText);
+      console.log(infoResponse);
+      if(infoResponse.success==true) {
+        document.getElementById("personalInfo").innerHTML = " ";
+        for(i in infoResponse) {
+          if(i!="success") {
+            var al = infoResponse[i];
+            var aux = document.createElement("li");
+            aux.innerHTML = i + ":  " + al;
+            document.getElementById("personalInfo").appendChild(aux);
+          }
+        }
+      } else {
+        var infoResponse = JSON.parse(this.responseText);
+        document.getElementById("personalInfo").innerHTML = " ";
+        var error = document.createElement('h5');
+        error.innerHTML = infoResponse.message;
+        document.getElementById("personalInfo").appendChild(error);
       }
-    } else {
-      document.getElementById("personalInfo").innerHTML = " ";
-      var error = document.createElement('h5');
-      error.innerHTML = infoResponse.message;
-      document.getElementById("personalInfo").appendChild(error);
     }
    };
   xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
   xhttp.send(JSON.stringify(data));
 };
 
-var postOwnMessage = function(form) {
+var postOwnMessage = function(form) { //ok
   var token = this.localStorage.getItem("token");
-  //if(form.dest.value == null){
   var dest = null;
-    //var dest = this.localStorage.getItem("dest");
   var message = form.message.value;
-  var req = new XMLHttpRequest();
-  var postMessageResponse = serverstub.postMessage(token, message, dest);
-  if(postMessageResponse.success==false) {
-    document.getElementById("errorPost").style.display = "block";
-    var error = document.createElement('h5');
-    error.innerHTML = postMessageResponse.message;
-    document.getElementById("errorPost").appendChild(error);
-    return false;
-  } else {
-    displayOwnMessages(token);
-    document.forms['postMessOwn'].reset();
-    return false;
-  }
+  var data = {'token' : token, 'message' : message, 'email' : dest};
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", '/post_message', true);
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var postMessageResponse = JSON.parse(this.responseText);
+      if(postMessageResponse.success==false) {
+        document.getElementById("errorPost").style.display = "block";
+        var error = document.createElement('h5');
+        error.innerHTML = postMessageResponse.message;
+        document.getElementById("errorPost").appendChild(error);
+      } else {
+        displayOwnMessages(token);
+        document.forms['postMessOwn'].reset();
+      }
+    }
+   };
+  xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+  xhttp.send(JSON.stringify(data));
 };
 
-var postmessageUser = function(form) {
+var postmessageUser = function(form) {  //ok
   var token = this.localStorage.getItem("token");
   var dest = searchUser(document.forms["searchuser"]).dest;
-  console.log(dest);
   var message = form.message.value;
-  var req = new XMLHttpRequest();
-  var postMessageResponse = serverstub.postMessage(token, message, dest);
-  if(postMessageResponse.success==false) {
-    document.getElementById("errorPost").style.display = "block";
-    var error = document.createElement('h5');
-    error.innerHTML = postMessageResponse.message;
-    document.getElementById("errorPost").appendChild(error);
-    return false;
-  } else {
-    searchUser(document.forms["searchuser"]);
-    document.forms['postMessUser'].reset();
-    return false;
-  }
+  var data = {'token' : token, 'message' : message, 'email' : dest};
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", '/post_message', true);
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var postMessageResponse = JSON.parse(this.responseText);
+      if(postMessageResponse.success==false) {
+        document.getElementById("errorPost").style.display = "block";
+        var error = document.createElement('h5');
+        error.innerHTML = postMessageResponse.message;
+        document.getElementById("errorPost").appendChild(error);
+      } else {
+        searchUser(document.forms["searchuser"]);
+        document.forms['postMessUser'].reset();
+      }
+    }
+   };
+  xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+  xhttp.send(JSON.stringify(data));
 };
 
 
-var displayOwnMessages = function(token) {
-  var req = new XMLHttpRequest();
-  var listMessage = serverstub.getUserMessagesByToken(token).data;
-  document.getElementById('wallMessage').innerHTML = " ";
-  for(i in listMessage) {
-    var writer = listMessage[i].writer;
-    var content = listMessage[i].content;
-    var aux = document.createElement("li");
-    aux.innerHTML = writer + ":  " + content;
-    document.getElementById("wallMessage").appendChild(aux);
+var displayOwnMessages = function(token) { //ok
+  var data = {"token" : token};
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", 'get/messages/by_token', true);
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var listMessage = JSON.parse(this.responseText);
+      console.log(listMessage);
+      document.getElementById('wallMessage').innerHTML = " ";
+      var i;
+      for(i=0; i < listMessage.length; i++) {
+        var writer = listMessage[i].sender;
+        var content = listMessage[i].message;
+        var aux = document.createElement("li");
+        aux.innerHTML = writer + ":  " + content;
+        document.getElementById("wallMessage").appendChild(aux);
+      }
+    }
   }
+  xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+  xhttp.send(JSON.stringify(data));
 };
 
 var searchUser = function(form) {
+  var went_well=false;
   var email = form.user.value;
-  //this.localStorage.setItem("dest", email);
   var token = this.localStorage.getItem("token");
-  var req1 = new XMLHttpRequest();
-  var req2 = new XMLHttpRequest();
-  var userDataResponse = serverstub.getUserDataByEmail(token, email);
-  var userMessagesResponse = serverstub.getUserMessagesByEmail(token, email);
-  if(userDataResponse.success == false || userMessagesResponse.success == false) {
-    document.getElementById('errorSearch').innerHTML = " ";
-    document.getElementById("resultSearch").style.display="none";
-    document.getElementById("errorSearch").style.display="block";
-    var post = document.createElement('h5');
-    post.innerHTML = userDataResponse.message;
-    document.getElementById("errorSearch").appendChild(post);
-    return false;
-  } else {
-    document.getElementById("resultSearch").style.display="block";
-    document.getElementById("errorSearch").style.display="none";
-    document.getElementById('userInfo').innerHTML = " ";
-    document.getElementById('wallMessageUser').innerHTML = " ";
-    var infoUser = userDataResponse.data;
-    var messageUser = userMessagesResponse.data;
-    for(i in infoUser) {
-      var al = infoUser[i];
-      var aux = document.createElement("li");
-      aux.innerHTML = i + ":  " + al;
-      document.getElementById("userInfo").appendChild(aux);
+  var data = {"token" : token, "email" : email};
+  var xhttp1 = new XMLHttpRequest();
+  xhttp1.open("POST", '/get/data/by_email', true);
+ //first connection to data
+  xhttp1.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+       var userDataResponse = JSON.parse(this.responseText);
+       console.log(userDataResponse);
+       if(userDataResponse.success==false) {
+          went_well=false;
+          document.getElementById('errorSearch').innerHTML = " ";
+          document.getElementById("resultSearch").style.display="none";
+          document.getElementById("errorSearch").style.display="block";
+          var post = document.createElement('h5');
+          post.innerHTML = userDataResponse.message;
+          document.getElementById("errorSearch").appendChild(post);
+          return false;
+      } else {
+        went_well=true;
+        document.getElementById("resultSearch").style.display="block";
+        document.getElementById("errorSearch").style.display="none";
+        document.getElementById('userInfo').innerHTML = " ";
+        document.getElementById('wallMessageUser').innerHTML = " ";
+        for(i in userDataResponse) {
+          if(i!="success") {
+            var al = userDataResponse[i];
+            var aux = document.createElement("li");
+            aux.innerHTML = i + ":  " + al;
+            document.getElementById("userInfo").appendChild(aux);
+          }
+        }
+        var xhttp2 = new XMLHttpRequest();
+        xhttp2.open("POST", '/get/messages/by_email', true);
+        xhttp2.onreadystatechange = function() {
+          //console.log("second connection");
+          //console.log(this.readyState);
+          //console.log(this.status);
+            if (this.readyState == 4 && this.status == 200) {
+              var userMessagesResponse = JSON.parse(this.responseText);
+              console.log(userMessagesResponse);
+              for(i in userMessagesResponse) {
+                var writer = userMessagesResponse[i].sender;
+                var content = userMessagesResponse[i].message;
+                var aux = document.createElement("li");
+                aux.innerHTML = writer + ":  " + content;
+                document.getElementById("wallMessageUser").appendChild(aux);
+              }
+              return {
+                dest:email,
+                result:false,
+              }
+             }
+            }
+          xhttp2.setRequestHeader("content-type", "application/json; charset=utf-8");
+          xhttp2.send(JSON.stringify(data));
+      }
     }
-    for(i in messageUser) {
-      var writer = messageUser[i].writer;
-      var content = messageUser[i].content;
-      var aux = document.createElement("li");
-      aux.innerHTML = writer + ":  " + content;
-      document.getElementById("wallMessageUser").appendChild(aux);
-    }
-    return {
-      dest:email,
-      result:false,
-    }
-  }
+  };
+  xhttp1.setRequestHeader("content-type", "application/json; charset=utf-8");
+  xhttp1.send(JSON.stringify(data));
 };
 
 var refreshOwnWall = function() {

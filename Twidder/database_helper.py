@@ -74,10 +74,7 @@ def get_user_data_by_token(token):
     cursor = get_db().execute('select * from users where email like (select email from loggedUser where token like ?)', [token])
     rows = cursor.fetchall()
     cursor.close()
-    data = []
-    for index in range(len(rows)):
-        data.append({'success' : True, 'email' : rows[index][0], 'firstname' : rows[index][2], 'familyname' : rows[index][3], 'gender' : rows[index][4], 'city' : rows[index][5], 'country' : rows[index][6]})
-
+    data = {"success" : True, "email" : rows[0][0], "firstname" : rows[0][2], "familyname" : rows[0][3], "gender" : rows[0][4], "city" : rows[0][5], "country" : rows[0][6]}
 
     return data
 
@@ -85,31 +82,28 @@ def get_user_data_by_email(email):
     cursor = get_db().execute('select * from users where email like ?', [email])
     rows = cursor.fetchall()
     cursor.close()
-    data = []
-    for index in range(len(rows)):
-        data.append({'email' : rows[index][0], 'firstname' : rows[index][2], 'familyname' : rows[index][3], 'gender' : rows[index][4], 'city' : rows[index][5], 'country' : rows[index][6]})
-
-
+    index = 0
+    data = {"success" : True, "email" : rows[index][0], "firstname" : rows[index][2], "familyname" : rows[index][3], "gender" : rows[index][4], "city" : rows[index][5], "country" : rows[index][6]}
     return data
 
 def get_user_messages_by_token(token):
-    cursor = get_db().execute('select message from message where sender like (select email from loggedUser where token like ?)', [token])
+    cursor = get_db().execute('select sender, message from message where receiver like (select email from loggedUser where token like ?)', [token])
     rows = cursor.fetchall()
     cursor.close()
     data = []
     for index in range(len(rows)):
-        data.append({'requested_message' : rows[index][0]})
+        data.append({'sender' : rows[index][0], 'message' : rows[index][1]})
 
     return data
 
 
-def get_user_messages_by_email(current_user_token, email):
-    cursor = get_db().execute('select message from message where sender like (select email from loggedUser where token like ?) and receiver like ?', [current_user_token, email])
+def get_user_messages_by_email(email):
+    cursor = get_db().execute('select sender, message from message where receiver like ?', [email])
     rows = cursor.fetchall()
     cursor.close()
     data = []
     for index in range(len(rows)):
-        data.append({'requested_message' : rows[index][0]})
+        data.append({'sender' : rows[index][0], 'message' : rows[index][1]})
 
     return data
 
