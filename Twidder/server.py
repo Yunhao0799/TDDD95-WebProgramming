@@ -86,13 +86,13 @@ def get_user_data_by_token():
     token = data['token']
     if token != None:
         result = database_helper.get_user_data_by_token(token)
-        if not result:
+        if result==None:
             return jsonify({'success' : False, 'message' : "No data with requested token"})
         return jsonify(result)
     else:
         return jsonify({'success' : False, 'message' : "Token has to be provided"})
 
-@app.route('/get/data/by_email', methods = ['POST'])
+@app.route('/get/data/by_email', methods = ['POST']) #ok
 def get_user_data_by_email():
     data = request.get_json()
     token = data['token']
@@ -100,7 +100,8 @@ def get_user_data_by_email():
     if token!= None:
         if email != None:
             result = database_helper.get_user_data_by_email(email)
-            if not result:
+            print(result)
+            if result==None:
                 return jsonify({'success' : False, 'message' : "No data with requested email"})
             return jsonify(result)
         else:
@@ -114,13 +115,13 @@ def get_user_messages_by_token():
     token = data['token']
     if token != None:
         result = database_helper.get_user_messages_by_token(token)
-        if not result:
+        if result==None:
             return jsonify({'success' : False, 'message' : "No message with requested token"})
         return jsonify(result)
     else:
         return jsonify({'success' : False, 'message' : "Token has to be provided"})
 
-@app.route('/get/messages/by_email', methods = ['POST'])
+@app.route('/get/messages/by_email', methods = ['POST']) #ok
 def get_user_messages_by_email():
     # Retrive current user messages with the user with given email
     data = request.get_json()
@@ -129,7 +130,7 @@ def get_user_messages_by_email():
     if token != None:
         if email != None:
             result = database_helper.get_user_messages_by_email(email)
-            if not result:
+            if result==None:
                 return jsonify({'success' : False, 'message' : "No message with requested email"})
             return jsonify(result)
         else:

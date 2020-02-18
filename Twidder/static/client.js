@@ -318,7 +318,7 @@ var displayOwnMessages = function(token) { //ok
   xhttp.send(JSON.stringify(data));
 };
 
-var searchUser = function(form) {
+var searchUser = function(form) {  //ok
   var went_well=false;
   var email = form.user.value;
   var token = this.localStorage.getItem("token");
@@ -384,11 +384,11 @@ var searchUser = function(form) {
   xhttp1.send(JSON.stringify(data));
 };
 
-var refreshOwnWall = function() {
+var refreshOwnWall = function() {  //ok
   var token = this.localStorage.getItem("token");
   displayOwnMessages(token);
 };
 
-var refreshUserWall = function() {
+var refreshUserWall = function() {  //ok
   searchUser(document.forms["searchuser"]);
 };
