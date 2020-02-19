@@ -83,11 +83,11 @@ def change_password():
         exists = database_helper.check_user_password(email, old_password)
         password_changed = database_helper.change_password(email, new_password)
         if password_changed and exists:
-            return jsonify({'Success' : True, 'message' : "Password succesfully changed"})
+            return jsonify({'success' : True, 'message' : "Password succesfully changed"})
         else:
-            return jsonify({'Success' : False, 'message' : "Something went wrong changing the password"})
+            return jsonify({'success' : False, 'message' : "Something went wrong changing the password"})
     else:
-         return jsonify({'Success': False, 'message' : "Make sure that all fields are filled and new password has at least 5 letters"})
+         return jsonify({'success': False, 'message' : "Make sure that all fields are filled and new password has at least 5 letters"})
 
 @app.route('/get/data/by_token', methods = ['GET'])
 def get_user_data_by_token():

@@ -30,7 +30,6 @@ def root():
 def sign_in():
     data = request.get_json()
     email = data['email']
-    print(email)
     password = data['password']
     boolean_success = database_helper.check_user_password(email, password)
     if boolean_success == True:
@@ -44,23 +43,18 @@ def sign_in():
         return jsonify({'success' : False, 'message' : "Wrong user or wrong password"})
     return None
 
-@app.route('/sign_up', methods = ['POST']) #you forgot the second password and check if same
+@app.route('/sign_up', methods = ['POST']) #ok
 def sign_up():
     data = request.get_json()
-    if "@" in data['email']:
-        if len(data['password']) >= 5:
-            if data['firstname'] != None and data['familyname'] != None and data['gender'] != None and data['city'] != None and data['country'] != None:
-                output_msg = database_helper.save_new_user(data['email'], data['password'], data['firstname'], data['familyname'], data['gender'], data['city'], data['country'])
-                if output_msg:
-                    return jsonify({'success' : True, 'message' : "Data saved succesfully"})
-                else:
-                    return jsonify({'success' : False, 'message' : "Something went wrong saving the data(maybe email already exists)"})
-            else:
-                return jsonify({'success' : False, 'message' : "Fields cannot be empty"})
+    already_exists = database_helper.check_if_email_exists(data['email'])
+    if already_exists :
+        return jsonify({'success' : False, 'message' : "User already exists."})
+    else :  #do not need to check if a field is empty because html code does it (required)
+        output_msg = database_helper.save_new_user(data['email'], data['password'], data['firstname'], data['familyname'], data['gender'], data['city'], data['country'])
+        if output_msg:
+            return jsonify({'success' : True, 'message' : "Data saved succesfully"})
         else:
-            return jsonify({'success' : False, 'message' : "Password too short"})
-    else:
-        return  jsonify({'success' : True, 'message' : "Invalid email"})
+            return jsonify({'success' : False, 'message' : "Something went wrong saving the data(maybe email already exists)"})
 
 
 @app.route('/sign_out', methods = ['POST']) #ok
@@ -76,7 +70,7 @@ def sign_out(token = None):
         return jsonify({'success' : False, 'message' : "Something went wrong when trying to sign out"})
 
 
-@app.route('/change_password', methods = ['POST'])
+@app.route('/change_password', methods = ['POST'])  #ok
 def change_password():
     data = request.get_json()
     token = data['token']
@@ -86,15 +80,16 @@ def change_password():
         email = database_helper.get_email_by_token(token)
         email = email[0]
         exists = database_helper.check_user_password(email, old_password)
+        if exists==False:
+            return jsonify({'success' : False, 'message' : "Wrong password"})
         password_changed = database_helper.change_password(email, new_password)
         if password_changed and exists:
-            return jsonify({'Success' : True, 'message' : "Password succesfully changed"})
-        else if password_changed and not exists:
-            return jsonify({'Success' : False, 'message' : "Wrong passeword"})
+            return jsonify({'success' : True, 'message' : "Password succesfully changed"})
         else:
-            return jsonify({'Success' : False, 'message' : "Something went wrong changing the password"})
+            return jsonify({'success' : False, 'message' : "Something went wrong changing the password"})
     else:
-        return jsonify({'Success' : False, 'message' : "You are not signed in."})
+        return jsonify({'success' : False, 'message' : "You are not signed in."})
+
 
 @app.route('/get/data/by_token', methods = ['POST'])  #ok
 def get_user_data_by_token():
@@ -116,7 +111,6 @@ def get_user_data_by_email():
     if token!= None:
         if email != None:
             result = database_helper.get_user_data_by_email(email)
-            print(result)
             if result==None:
                 return jsonify({'success' : False, 'message' : "No data with requested email"})
             return jsonify(result)
@@ -161,25 +155,19 @@ def post_message():
     current_user_token = data['token']
     message = data['message']
     dest_email = data['email']
-
     sender_mail = database_helper.get_email_by_token(current_user_token)
     sender_mail = sender_mail[0]
-
     if dest_email==None:
         dest_email = sender_mail
-
     if current_user_token != None and dest_email != None:
-
         if database_helper.check_if_email_exists(sender_mail) and database_helper.check_if_email_exists(dest_email):
             success_post = database_helper.post_message(sender_mail, message, dest_email)
             if success_post:
                 return jsonify({'success' : True, 'message' : "Message posted succesfully"})
             else:
                 return jsonify({'success' : False, 'message' : "Something went wrong posting the message"})
-
         else:
                 return jsonify({'success' : False, 'message' : "Provided token or email do not exist"})
-
     else:
         return jsonify({'success' : False, 'message' : "Token and destination email cannot be void"})
 

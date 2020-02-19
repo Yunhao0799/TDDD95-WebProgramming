@@ -148,7 +148,7 @@ def check_if_email_exists(email):
         return False
     else:
         return True
-        
+
 
 def change_password(email, new_password):
     try:

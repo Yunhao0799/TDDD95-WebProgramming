@@ -20,12 +20,13 @@ window.onload = function(){
 };
 
 
-checkSignup = function(form) {
+checkSignup = function(form) {   //ok
   var goodLength = function(password) {
     if(password.value.length < 5) {
       document.getElementById("errorSignup").style.display = "none";
       document.getElementById("okSignup").style.display = "none";
       document.getElementById("wrongSame1").style.display = "none";
+      document.getElementById("wrongLength1").innerHTML = "";
       document.getElementById("wrongLength1").style.display = "block";
       var errorLength = document.createElement('h5');
       errorLength.innerHTML = "Password too short. You need at least 5 characters.";
@@ -40,6 +41,7 @@ checkSignup = function(form) {
       document.getElementById("errorSignup").style.display = "none";
       document.getElementById("okSignup").style.display = "none";
       document.getElementById("wrongLength1").style.display = "none";
+      document.getElementById("wrongSame1").innerHTML = "";
       document.getElementById("wrongSame1").style.display = "block";
       var errorSame = document.createElement('h5');
       errorSame.innerHTML = "It is not the same password";
@@ -50,30 +52,35 @@ checkSignup = function(form) {
     }
   };
   if(goodLength(form.password1) && samePwd(form.password1, form.password2)) {
-    var account = {"email" : form.email.value, "password" : form.password1.value, "firstname" : form.firstname.value, "familyname" : form.familyname.value, "gender" : form.gender.value, "city" : form.city.value, "country" : form.country.value};
-    var req = new XMLHttpRequest();
-    let signUpResponse = serverstub.signUp(account);
-    console.log(signUpResponse);
-    if (signUpResponse.success==false) {
-      document.getElementById("errorSignup").style.display = "block";
-      document.getElementById("okSignup").style.display = "none";
-      document.getElementById("wrongLength1").style.display = "none";
-      document.getElementById("wrongSame1").style.display = "none";
-      var error = document.createElement('h5');
-      error.innerHTML = signUpResponse.message;
-      document.getElementById("errorSignup").appendChild(error);
-      return false;
-    } else {
-      document.getElementById("wrongSame1").style.display = "none";
-      document.getElementById("errorSignup").style.display = "none";
-      document.getElementById("wrongLength1").style.display = "none";
-      document.getElementById("okSignup").style.display = "block";
-      var ok = document.createElement('h4');
-      ok.innerHTML = signUpResponse.message;
-      document.getElementById("okSignup").appendChild(ok);
-      document.forms['sign'].reset();
-      return false;
+    var data = {"email" : form.email.value, "password" : form.password1.value, "firstname" : form.firstname.value, "familyname" : form.familyname.value, "gender" : form.gender.value, "city" : form.city.value, "country" : form.country.value};
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", '/sign_up', true);
+    xhttp.onreadystatechange = function() {
+      if(this.readyState == 4 && this.status == 200) {
+        var signUpResponse = JSON.parse(this.responseText);
+        //console.log(signUpResponse);
+        if(signUpResponse.success==false) {
+          document.getElementById("errorSignup").style.display = "block";
+          document.getElementById("okSignup").style.display = "none";
+          document.getElementById("wrongLength1").style.display = "none";
+          document.getElementById("wrongSame1").style.display = "none";
+          var error = document.createElement('h5');
+          error.innerHTML = signUpResponse.message;
+          document.getElementById("errorSignup").appendChild(error);
+        } else {
+          document.getElementById("wrongSame1").style.display = "none";
+          document.getElementById("errorSignup").style.display = "none";
+          document.getElementById("wrongLength1").style.display = "none";
+          document.getElementById("okSignup").style.display = "block";
+          var ok = document.createElement('h4');
+          ok.innerHTML = signUpResponse.message;
+          document.getElementById("okSignup").appendChild(ok);
+          document.forms['sign'].reset();
+        }
+      }
     }
+    xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+    xhttp.send(JSON.stringify(data));
   } else {
     return false;
   };
@@ -91,7 +98,7 @@ checkSignIn = function(form){ //ok
     if(this.readyState == 4 && this.status == 200) {
     var signInResponse = JSON.parse(this.responseText);
     if (signInResponse.success == true) {
-      console.log(signInResponse);
+      //console.log(signInResponse);
       localStorage.setItem("token", signInResponse.message);
       return window.onload();
     } else {
@@ -125,7 +132,7 @@ function openTab(evt, tabName, element){ //ok
 //The function hides all elements with the class name "tab" (display="none"), and displays the element with the given tab name (display="block");
 
 
-var changePswd = function(form){
+var changePswd = function(form){ //ok
 
   var oldPswd = form.oldPswd.value;
   var newPswd = form.newPswd.value;
@@ -137,6 +144,7 @@ var changePswd = function(form){
       document.getElementById("errorNewPass").style.display = "none";
       document.getElementById("okChange").style.display = "none";
       document.getElementById("wrongLength").style.display = "none";
+      document.getElementById("wrongSame").innerHTML = "";
       document.getElementById("wrongSame").style.display = "block";
       var errorSame = document.createElement('h5');
       errorSame.innerHTML = "It is not the same password";
@@ -151,6 +159,7 @@ var changePswd = function(form){
       document.getElementById("errorNewPass").style.display = "none";
       document.getElementById("okChange").style.display = "none";
       document.getElementById("wrongSame").style.display = "none";
+      document.getElementById("wrongLength").innerHTML = "";
       document.getElementById("wrongLength").style.display = "block";
       var errorLength = document.createElement('h5');
       errorLength.innerHTML = "Password too short. You need at least 5 characters.";
@@ -163,25 +172,31 @@ var changePswd = function(form){
 
   if(samePwd(newPswd, newPswd2) && goodLength(newPswd)) {
     var xhttp = new XMLHttpRequest();
-    var changePswdResponse = serverstub.changePassword(token, oldPswd, newPswd);
-    console.log(changePswdResponse);
-    if(changePswdResponse.success==false) {
-      document.getElementById("errorNewPass").style.display = "block";
-      document.getElementById("okChange").style.display = "none";
-      document.getElementById("wrongLength").style.display = "none";
-      document.getElementById("wrongSame").style.display = "none";
-      var error = document.createElement('h5');
-      error.innerHTML = changePswdResponse.message;
-      document.getElementById("errorNewPass").appendChild(error);
-      return false;
-    } else {
-      document.getElementById("wrongSame").style.display = "none";
-      document.getElementById("errorNewPass").style.display = "none";
-      document.getElementById("wrongLength").style.display = "none";
-      document.getElementById("okChange").style.display = "block";
-      document.forms['changePassword'].reset();
-      return false;
-    };
+    var data = {"token" : token, "old_password" : oldPswd, "new_password" : newPswd};
+    xhttp.open("POST", '/change_password', true);
+    xhttp.onreadystatechange = function() {
+      if(this.readyState == 4 && this.status == 200) {
+        var changePswdResponse = JSON.parse(this.responseText);
+        //console.log(changePswdResponse);
+        if(changePswdResponse.success==false) {
+          document.getElementById("errorNewPass").style.display = "block";
+          document.getElementById("okChange").style.display = "none";
+          document.getElementById("wrongLength").style.display = "none";
+          document.getElementById("wrongSame").style.display = "none";
+          var error = document.createElement('h5');
+          error.innerHTML = changePswdResponse.message;
+          document.getElementById("errorNewPass").appendChild(error);
+        } else {
+          document.getElementById("wrongSame").style.display = "none";
+          document.getElementById("errorNewPass").style.display = "none";
+          document.getElementById("wrongLength").style.display = "none";
+          document.getElementById("okChange").style.display = "block";
+          document.forms['changePassword'].reset();
+        }
+      }
+    }
+    xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+    xhttp.send(JSON.stringify(data));
   } else {
     return false;
   };
@@ -197,7 +212,6 @@ var logOut = function() {  //a problem to fix... but ok
     if(this.readyState == 4 && this.status == 200) {
     var signOutResponse = JSON.parse(this.responseText);
     if (signOutResponse.success==true) {
-      console.log(signOutResponse);
       localStorage.removeItem('token');
       return displayView("welcomeview");
     } else {
@@ -219,7 +233,7 @@ var infoPerso = function(token){  //ok
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var infoResponse = JSON.parse(this.responseText);
-      console.log(infoResponse);
+      //console.log(infoResponse);
       if(infoResponse.success==true) {
         document.getElementById("personalInfo").innerHTML = " ";
         for(i in infoResponse) {
@@ -268,7 +282,7 @@ var postOwnMessage = function(form) { //ok
   xhttp.send(JSON.stringify(data));
 };
 
-var postmessageUser = function(form) {  //ok
+var postmessageUser = function(form) { //ok
   var token = this.localStorage.getItem("token");
   var dest = searchUser(document.forms["searchuser"]).dest;
   var message = form.message.value;
@@ -278,11 +292,12 @@ var postmessageUser = function(form) {  //ok
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var postMessageResponse = JSON.parse(this.responseText);
+      //console.log(postMessageResponse);
       if(postMessageResponse.success==false) {
-        document.getElementById("errorPost").style.display = "block";
+        document.getElementById("errorPost2").style.display = "block";
         var error = document.createElement('h5');
         error.innerHTML = postMessageResponse.message;
-        document.getElementById("errorPost").appendChild(error);
+        document.getElementById("errorPost2").appendChild(error);
       } else {
         searchUser(document.forms["searchuser"]);
         document.forms['postMessUser'].reset();
@@ -301,7 +316,7 @@ var displayOwnMessages = function(token) { //ok
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var listMessage = JSON.parse(this.responseText);
-      console.log(listMessage);
+      //console.log(listMessage);
       document.getElementById('wallMessage').innerHTML = " ";
       var i;
       for(i=0; i < listMessage.length; i++) {
@@ -324,11 +339,10 @@ var searchUser = function(form) {  //ok
   var data = {"token" : token, "email" : email};
   var xhttp1 = new XMLHttpRequest();
   xhttp1.open("POST", '/get/data/by_email', true);
- //first connection to data
   xhttp1.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
        var userDataResponse = JSON.parse(this.responseText);
-       console.log(userDataResponse);
+       //console.log(userDataResponse);
        if(userDataResponse.success==false) {
           went_well=false;
           document.getElementById('errorSearch').innerHTML = " ";
@@ -355,22 +369,15 @@ var searchUser = function(form) {  //ok
         var xhttp2 = new XMLHttpRequest();
         xhttp2.open("POST", '/get/messages/by_email', true);
         xhttp2.onreadystatechange = function() {
-          //console.log("second connection");
-          //console.log(this.readyState);
-          //console.log(this.status);
             if (this.readyState == 4 && this.status == 200) {
               var userMessagesResponse = JSON.parse(this.responseText);
-              console.log(userMessagesResponse);
+              //console.log(userMessagesResponse);
               for(i in userMessagesResponse) {
                 var writer = userMessagesResponse[i].sender;
                 var content = userMessagesResponse[i].message;
                 var aux = document.createElement("li");
                 aux.innerHTML = writer + ":  " + content;
                 document.getElementById("wallMessageUser").appendChild(aux);
-              }
-              return {
-                dest:email,
-                result:false,
               }
              }
             }
@@ -381,6 +388,10 @@ var searchUser = function(form) {  //ok
   };
   xhttp1.setRequestHeader("content-type", "application/json; charset=utf-8");
   xhttp1.send(JSON.stringify(data));
+  return {
+    dest:email,
+    result:false,
+  }
 };
 
 var refreshOwnWall = function() {  //ok
