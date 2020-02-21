@@ -4,14 +4,14 @@
 # using Python and Flask                                                       #
 ################################################################################
 
+from gevent.pywsgi import WSGIServer
+from geventwebsocket.handler import WebSocketHandler
 from flask import Flask, request, render_template
 import database_helper
 import json
 from flask import jsonify
 # module secrets used for generate token
 import secrets
-#from geventwebsocket.handler import WebSocketHandler
-#from gevent.pywsgi import WSGIServer
 
 
 
@@ -180,4 +180,5 @@ def post_message():
 
 
 if __name__ == '__main__':
-    app.run()
+    http_server = WSGIServer(('',5000), app, handler_class=WebSocketHandler)
+    http_server.serve_forever()
