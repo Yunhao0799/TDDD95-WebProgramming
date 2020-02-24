@@ -47,7 +47,7 @@ def check_user_password(email, password):
 
 def link_token_to_user(email, token):
     try:
-        get_db().execute("insert into loggedUser values(?,?)", [email, token])
+        get_db().execute("insert or replace into loggedUser values(?,?)", [email, token])
         get_db().commit()
         return True
     except:

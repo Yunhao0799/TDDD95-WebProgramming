@@ -13,7 +13,7 @@ from flask import jsonify
 # module secrets used for generate token
 import secrets
 
-
+socketsTab = {}
 
 app = Flask(__name__)
 
@@ -172,9 +172,22 @@ def post_message():
         return jsonify({'success' : False, 'message' : "Token and destination email cannot be void"})
 
 
+@app.route('/api')
+def api():
+    if request.environ.get('wsgi.websocket'):
+        ws = request.environ['wsgi.websocket']
+        email = ws.receive()
 
+        if email in socketsTab:
+            socketsTab[email].send("sign_out")
 
+        socketsTab[email]=ws
 
+        try:
+            while True:
+                email = ws.receive()
+        except:
+            return "Connection socket failed"
 
 
 

@@ -12,6 +12,7 @@ window.onload = function(){
     displayView('welcomeview');
   } else {
     var token = this.localStorage.getItem("token");
+    checkSocket();
     displayView("profileview");
     document.getElementById("variousMess").style.display = "none";
     infoPerso(token);
@@ -100,6 +101,7 @@ checkSignIn = function(form){ //ok
     if (signInResponse.success == true) {
       //console.log(signInResponse);
       localStorage.setItem("token", signInResponse.message);
+      localStorage.setItem("email", user);
       return window.onload();
     } else {
       document.getElementById('errorSignin').innerHTML = " ";
@@ -213,7 +215,8 @@ var logOut = function() {  //a problem to fix... but ok
     var signOutResponse = JSON.parse(this.responseText);
     if (signOutResponse.success==true) {
       localStorage.removeItem('token');
-      return displayView("welcomeview");
+      localStorage.removeItem('email');
+      return window.onload();
     } else {
       document.getElementById("variousMess").innerHTML = " ";
       document.getElementById("variousMess").style.display = "block";
@@ -401,4 +404,23 @@ var refreshOwnWall = function() {  //ok
 
 var refreshUserWall = function() {  //ok
   searchUser(document.forms["searchuser"]);
+};
+
+
+function checkSocket(){
+  var email = localStorage.getItem('email');
+  var socket = new WebSocket("ws://localhost:5000/api");
+  socket.onopen = function(){
+    socket.send(email);
+  }
+  socket.onerror = function(error){
+    console.log("WS Error: " + error);
+  }
+  socket.onmessage = function(event){
+    if(event.data == "sign_out"){
+      localStorage.removeItem("token");
+      localStorage.removeItem('email');
+      return window.onload();
+    }
+  }
 };
