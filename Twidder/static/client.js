@@ -427,3 +427,4 @@ function checkSocket(email){
     }
   }
 };
+//problem : geventwebsocket.exceptions.WebSocketError: Socket is dead especially when we refresh the page 
