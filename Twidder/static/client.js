@@ -12,7 +12,8 @@ window.onload = function(){
     displayView('welcomeview');
   } else {
     var token = this.localStorage.getItem("token");
-    checkSocket();
+    var email = localStorage.getItem('email');
+    checkSocket(email);
     displayView("profileview");
     document.getElementById("variousMess").style.display = "none";
     infoPerso(token);
@@ -205,7 +206,7 @@ var changePswd = function(form){ //ok
 };
 
 
-var logOut = function() {  //a problem to fix... but ok
+var logOut = function() {
   var token = this.localStorage.getItem("token");
   var data = {"token" : token};
   var xhttp = new XMLHttpRequest();
@@ -216,6 +217,7 @@ var logOut = function() {  //a problem to fix... but ok
     if (signOutResponse.success==true) {
       localStorage.removeItem('token');
       localStorage.removeItem('email');
+      location.reload();
       return window.onload();
     } else {
       document.getElementById("variousMess").innerHTML = " ";
@@ -407,10 +409,10 @@ var refreshUserWall = function() {  //ok
 };
 
 
-function checkSocket(){
-  var email = localStorage.getItem('email');
+function checkSocket(email){
   var socket = new WebSocket("ws://localhost:5000/api");
   socket.onopen = function(){
+    console.log("in onopen function");
     socket.send(email);
   }
   socket.onerror = function(error){
@@ -418,9 +420,10 @@ function checkSocket(){
   }
   socket.onmessage = function(event){
     if(event.data == "sign_out"){
+      console.log("in the if event loop");
       localStorage.removeItem("token");
       localStorage.removeItem('email');
-      return window.onload();
+      displayView('welcomeview');
     }
   }
 };

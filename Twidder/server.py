@@ -177,12 +177,10 @@ def api():
     if request.environ.get('wsgi.websocket'):
         ws = request.environ['wsgi.websocket']
         email = ws.receive()
-
         if email in socketsTab:
-            socketsTab[email].send("sign_out")
-
-        socketsTab[email]=ws
-
+            socketsTab[email].send("sign_out")  #socketTab[email] is the current socket
+        socketsTab[email]=ws  #links the email to the socket. The socket becomes the last connection
+        print(socketsTab)
         try:
             while True:
                 email = ws.receive()
