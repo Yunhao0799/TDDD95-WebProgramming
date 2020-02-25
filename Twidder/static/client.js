@@ -12,7 +12,6 @@ window.onload = function(){
     displayView('welcomeview');
   } else {
     var token = this.localStorage.getItem("token");
-    // var email = localStorage.getItem('email');
     checkSocket(token);
     displayView("profileview");
     document.getElementById("variousMess").style.display = "none";
@@ -22,7 +21,7 @@ window.onload = function(){
 };
 
 
-checkSignup = function(form) {   //ok
+checkSignup = function(form) {
   var goodLength = function(password) {
     if(password.value.length < 5) {
       document.getElementById("errorSignup").style.display = "none";
@@ -89,7 +88,7 @@ checkSignup = function(form) {   //ok
 };
 
 
-checkSignIn = function(form){ //ok
+checkSignIn = function(form){
 
   var user = form.logMail.value;
   var password = form.logPswd.value;
@@ -102,7 +101,6 @@ checkSignIn = function(form){ //ok
     if (signInResponse.success == true) {
       //console.log(signInResponse);
       localStorage.setItem("token", signInResponse.message);
-      localStorage.setItem("email", user);
       return window.onload();
     } else {
       document.getElementById('errorSignin').innerHTML = " ";
@@ -118,7 +116,7 @@ checkSignIn = function(form){ //ok
   xhttp.send(JSON.stringify(data));
 };
 
-function openTab(evt, tabName, element){ //ok
+function openTab(evt, tabName, element){
   var i;
   var tabs = document.getElementsByClassName("tab");
   for(i = 0; i < tabs.length; i++) {
@@ -135,7 +133,7 @@ function openTab(evt, tabName, element){ //ok
 //The function hides all elements with the class name "tab" (display="none"), and displays the element with the given tab name (display="block");
 
 
-var changePswd = function(form){ //ok
+var changePswd = function(form){
 
   var oldPswd = form.oldPswd.value;
   var newPswd = form.newPswd.value;
@@ -216,7 +214,6 @@ var logOut = function() {
     var signOutResponse = JSON.parse(this.responseText);
     if (signOutResponse.success==true) {
       localStorage.removeItem('token');
-      localStorage.removeItem('email');
       location.reload();
       return window.onload();
     } else {
@@ -231,7 +228,7 @@ var logOut = function() {
 };
 
 
-var infoPerso = function(token){  //ok
+var infoPerso = function(token){
   var data = {"token" : token};
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/get/data/by_token', true);
@@ -262,7 +259,7 @@ var infoPerso = function(token){  //ok
   xhttp.send(JSON.stringify(data));
 };
 
-var postOwnMessage = function(form) { //ok
+var postOwnMessage = function(form) {
   var token = this.localStorage.getItem("token");
   var dest = null;
   var message = form.message.value;
@@ -287,7 +284,7 @@ var postOwnMessage = function(form) { //ok
   xhttp.send(JSON.stringify(data));
 };
 
-var postmessageUser = function(form) { //ok
+var postmessageUser = function(form) {
   var token = this.localStorage.getItem("token");
   var dest = searchUser(document.forms["searchuser"]).dest;
   var message = form.message.value;
@@ -314,7 +311,7 @@ var postmessageUser = function(form) { //ok
 };
 
 
-var displayOwnMessages = function(token) { //ok
+var displayOwnMessages = function(token) {
   var data = {"token" : token};
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", 'get/messages/by_token', true);
@@ -337,7 +334,7 @@ var displayOwnMessages = function(token) { //ok
   xhttp.send(JSON.stringify(data));
 };
 
-var searchUser = function(form) {  //ok
+var searchUser = function(form) {
   var went_well=false;
   var email = form.user.value;
   var token = this.localStorage.getItem("token");
@@ -399,44 +396,32 @@ var searchUser = function(form) {  //ok
   }
 };
 
-var refreshOwnWall = function() {  //ok
+var refreshOwnWall = function() {
   var token = this.localStorage.getItem("token");
   displayOwnMessages(token);
 };
 
-var refreshUserWall = function() {  //ok
+var refreshUserWall = function() {
   searchUser(document.forms["searchuser"]);
 };
 
 
 function checkSocket(token){
   var socket = new WebSocket("ws://localhost:5000/api");
-
-
   // socket.onerror = function(error){
   //   console.log("WS Error: " + error);
   // }
-
   socket.onmessage = function(event){
     if(event.data == "sign_out"){
       console.log("in the if event loop");
       localStorage.removeItem("token");
       socket.close();
-      /*socket.onclose = function() {
-        console.log("Error socket closed unexpected");
-      }*/
-
-      // localStorage.removeItem('email');
       // displayView('welcomeview');
       window.onload();
     }
   }
-
-
-
   socket.onopen = function(){
     console.log("in onopen function");
     socket.send(token);
   }
 };
-//problem : geventwebsocket.exceptions.WebSocketError: Socket is dead especially when we refresh the page

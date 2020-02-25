@@ -26,7 +26,7 @@ def root():
 
 
 
-@app.route('/sign_in', methods = ['PUT']) #ok
+@app.route('/sign_in', methods = ['PUT'])
 def sign_in():
     data = request.get_json()
     email = data['email']
@@ -43,7 +43,7 @@ def sign_in():
         return jsonify({'success' : False, 'message' : "Wrong user or wrong password"})
     return None
 
-@app.route('/sign_up', methods = ['POST']) #ok
+@app.route('/sign_up', methods = ['POST'])
 def sign_up():
     data = request.get_json()
     already_exists = database_helper.check_if_email_exists(data['email'])
@@ -57,7 +57,7 @@ def sign_up():
             return jsonify({'success' : False, 'message' : "Something went wrong saving the data(maybe email already exists)"})
 
 
-@app.route('/sign_out', methods = ['POST']) #ok
+@app.route('/sign_out', methods = ['POST'])
 def sign_out(token = None):
     data = request.get_json()
     token = data['token']
@@ -70,7 +70,7 @@ def sign_out(token = None):
         return jsonify({'success' : False, 'message' : "Something went wrong when trying to sign out"})
 
 
-@app.route('/change_password', methods = ['POST'])  #ok
+@app.route('/change_password', methods = ['POST'])
 def change_password():
     data = request.get_json()
     token = data['token']
@@ -91,7 +91,7 @@ def change_password():
         return jsonify({'success' : False, 'message' : "You are not signed in."})
 
 
-@app.route('/get/data/by_token', methods = ['POST'])  #ok
+@app.route('/get/data/by_token', methods = ['POST'])
 def get_user_data_by_token():
     data = request.get_json()
     token = data['token']
@@ -103,7 +103,7 @@ def get_user_data_by_token():
     else:
         return jsonify({'success' : False, 'message' : "Token has to be provided"})
 
-@app.route('/get/data/by_email', methods = ['POST']) #ok
+@app.route('/get/data/by_email', methods = ['POST'])
 def get_user_data_by_email():
     data = request.get_json()
     token = data['token']
@@ -119,7 +119,7 @@ def get_user_data_by_email():
     else:
         return jsonify({'success' : False, 'message' : "You are not signed in."})
 
-@app.route('/get/messages/by_token', methods = ['POST']) #ok
+@app.route('/get/messages/by_token', methods = ['POST'])
 def get_user_messages_by_token():
     data = request.get_json()
     token = data['token']
@@ -131,7 +131,7 @@ def get_user_messages_by_token():
     else:
         return jsonify({'success' : False, 'message' : "Token has to be provided"})
 
-@app.route('/get/messages/by_email', methods = ['POST']) #ok
+@app.route('/get/messages/by_email', methods = ['POST'])
 def get_user_messages_by_email():
     # Retrive current user messages with the user with given email
     data = request.get_json()
@@ -149,7 +149,7 @@ def get_user_messages_by_email():
         return jsonify({'success' : False, 'message' : "You are not signed in."})
 
 
-@app.route('/post_message', methods = ['POST'])  #ok
+@app.route('/post_message', methods = ['POST'])  
 def post_message():
     data = request.get_json()
     current_user_token = data['token']
@@ -177,27 +177,24 @@ def api():
     if request.environ.get('wsgi.websocket'):
         ws = request.environ['wsgi.websocket']
         token = ws.receive()
-        print(token)
+        #print(token)
         aux = database_helper.get_email_by_token(token)
         email = aux[0]
-        print(email)
+        #print(email)
         if email in socketsTab:
             oldSocket = socketsTab[email]
             try:
-                oldSocket.send("sign_out")  #socketTab[email] is the current socket
+                oldSocket.send("sign_out")
             except:
                 print("Failed sending sign_out")
-
-
             del socketsTab[email]
-            # return "Sended sign_out"
-        socketsTab[email]=ws  #links the email to the socket. The socket becomes the last connection
+
+        socketsTab[email]=ws
         print(socketsTab)
 
         while True:
             try:
                 token = ws.receive()
-
             except:
                 return "Connection socket failed"
 
