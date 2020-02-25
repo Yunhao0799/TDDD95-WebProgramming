@@ -191,5 +191,6 @@ def api():
 
 
 if __name__ == '__main__':
+    print("http://localhost:5000/")
     http_server = WSGIServer(('',5000), app, handler_class=WebSocketHandler)
     http_server.serve_forever()
