@@ -411,26 +411,29 @@ var refreshUserWall = function() {  //ok
 
 function checkSocket(token){
   var socket = new WebSocket("ws://localhost:5000/api");
-  socket.onopen = function(){
-    console.log("in onopen function");
-    socket.send(token);
-  }
 
-  socket.onerror = function(error){
-    console.log("WS Error: " + error);
-  }
+
+  // socket.onerror = function(error){
+  //   console.log("WS Error: " + error);
+  // }
 
   socket.onmessage = function(event){
     if(event.data == "sign_out"){
       console.log("in the if event loop");
       localStorage.removeItem("token");
+
+
       // localStorage.removeItem('email');
-      displayView('welcomeview');
+      // displayView('welcomeview');
+      window.onload();
     }
   }
 
-  socket.onclose = function() {
-    console.log("Error socket closed unexpected");
+
+
+  socket.onopen = function(){
+    console.log("in onopen function");
+    socket.send(token);
   }
 };
 //problem : geventwebsocket.exceptions.WebSocketError: Socket is dead especially when we refresh the page

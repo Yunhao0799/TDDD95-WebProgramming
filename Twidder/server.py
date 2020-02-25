@@ -196,15 +196,13 @@ def api():
 
         while True:
             try:
-                email = ws.receive()
+                token = ws.receive()
 
             except:
                 return "Connection socket failed"
 
-        return "End if api"
+    return "End if api"
 
-    else:
-        return "api else"
 
 
 
