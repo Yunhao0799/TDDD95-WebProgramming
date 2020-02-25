@@ -189,7 +189,7 @@ def api():
                 print("Failed sending sign_out")
 
 
-            del socketTab[email]
+            del socketsTab[email]
             # return "Sended sign_out"
         socketsTab[email]=ws  #links the email to the socket. The socket becomes the last connection
         print(socketsTab)

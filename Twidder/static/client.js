@@ -421,7 +421,10 @@ function checkSocket(token){
     if(event.data == "sign_out"){
       console.log("in the if event loop");
       localStorage.removeItem("token");
-
+      socket.close();
+      /*socket.onclose = function() {
+        console.log("Error socket closed unexpected");
+      }*/
 
       // localStorage.removeItem('email');
       // displayView('welcomeview');
