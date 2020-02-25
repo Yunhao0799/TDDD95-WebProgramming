@@ -12,8 +12,8 @@ window.onload = function(){
     displayView('welcomeview');
   } else {
     var token = this.localStorage.getItem("token");
-    var email = localStorage.getItem('email');
-    checkSocket(email);
+    // var email = localStorage.getItem('email');
+    checkSocket(token);
     displayView("profileview");
     document.getElementById("variousMess").style.display = "none";
     infoPerso(token);
@@ -409,22 +409,28 @@ var refreshUserWall = function() {  //ok
 };
 
 
-function checkSocket(email){
+function checkSocket(token){
   var socket = new WebSocket("ws://localhost:5000/api");
   socket.onopen = function(){
     console.log("in onopen function");
-    socket.send(email);
+    socket.send(token);
   }
+
   socket.onerror = function(error){
     console.log("WS Error: " + error);
   }
+
   socket.onmessage = function(event){
     if(event.data == "sign_out"){
       console.log("in the if event loop");
       localStorage.removeItem("token");
-      localStorage.removeItem('email');
+      // localStorage.removeItem('email');
       displayView('welcomeview');
     }
   }
+
+  socket.onclose = function() {
+    console.log("Error socket closed unexpected");
+  }
 };
-//problem : geventwebsocket.exceptions.WebSocketError: Socket is dead especially when we refresh the page 
+//problem : geventwebsocket.exceptions.WebSocketError: Socket is dead especially when we refresh the page

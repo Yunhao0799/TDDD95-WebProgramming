@@ -176,17 +176,35 @@ def post_message():
 def api():
     if request.environ.get('wsgi.websocket'):
         ws = request.environ['wsgi.websocket']
-        email = ws.receive()
+        token = ws.receive()
+        print(token)
+        aux = database_helper.get_email_by_token(token)
+        email = aux[0]
+        print(email)
         if email in socketsTab:
-            socketsTab[email].send("sign_out")  #socketTab[email] is the current socket
+            oldSocket = socketsTab[email]
+            try:
+                oldSocket.send("sign_out")  #socketTab[email] is the current socket
+            except:
+                print("Failed sending sign_out")
+
+
+            del socketTab[email]
+            # return "Sended sign_out"
         socketsTab[email]=ws  #links the email to the socket. The socket becomes the last connection
         print(socketsTab)
-        try:
-            while True:
-                email = ws.receive()
-        except:
-            return "Connection socket failed"
 
+        while True:
+            try:
+                email = ws.receive()
+
+            except:
+                return "Connection socket failed"
+
+        return "End if api"
+
+    else:
+        return "api else"
 
 
 

@@ -121,12 +121,13 @@ def get_email_by_token(token):
         cursor = get_db().execute('select email from users where email like (select email from loggedUser where token like ?)', [token])
         rows = cursor.fetchall()
         cursor.close()
-        data = []
-        for index in range(len(rows)):
-            data.append(rows[index][0])
-
-
-        return data
+        if rows==[]:
+            return None
+        else:
+            data = []
+            for index in range(len(rows)):
+                data.append(rows[index][0])
+            return data
 
 def post_message(sender_mail, message, dest_email):
         try:
