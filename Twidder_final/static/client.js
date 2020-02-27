@@ -421,7 +421,54 @@ function checkSocket(token){
     }
   }
   socket.onopen = function(){
-    console.log("in onopen function");
     socket.send(token);
   }
 };
+
+
+function getLocation() {
+  var x=document.getElementById("demo");
+  if (navigator.geolocation)
+    {
+    navigator.geolocation.getCurrentPosition(showSimplePosition,showErrorPosition);
+    }
+  else{x.innerHTML="Geolocation is not supported by this browser.";}
+};
+
+function showSimplePosition(position) {
+  var x=document.getElementById("demo");
+  var lat = position.coords.latitude.toString();
+  var long = position.coords.longitude.toString();
+  x.innerHTML = "Latitude: " + lat + "<br>Longitude: " + long;
+  var data = {'lat' : lat, 'long' : long};
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", 'get/position', true);
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var positionResponse = JSON.parse(this.responseText);
+      console.log(positionResponse);
+    }
+  }
+  xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+  xhttp.send(JSON.stringify(data));
+};
+
+
+function showErrorPosition(error) {
+  var x=document.getElementById("demo");
+  switch(error.code)
+    {
+    case error.PERMISSION_DENIED:
+      x.innerHTML="User denied the request for Geolocation."
+      break;
+    case error.POSITION_UNAVAILABLE:
+      x.innerHTML="Location information is unavailable."
+      break;
+    case error.TIMEOUT:
+      x.innerHTML="The request to get user location timed out."
+      break;
+    case error.UNKNOWN_ERROR:
+      x.innerHTML="An unknown error occurred."
+      break;
+    }
+  };

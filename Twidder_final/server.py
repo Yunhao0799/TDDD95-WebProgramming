@@ -10,6 +10,7 @@ from flask import Flask, request, render_template
 import database_helper
 import json
 from flask import jsonify
+import requests
 # module secrets used for generate token
 import secrets
 
@@ -149,7 +150,7 @@ def get_user_messages_by_email():
         return jsonify({'success' : False, 'message' : "You are not signed in."})
 
 
-@app.route('/post_message', methods = ['POST'])  
+@app.route('/post_message', methods = ['POST'])
 def post_message():
     data = request.get_json()
     current_user_token = data['token']
@@ -199,6 +200,15 @@ def api():
                 return "Connection socket failed"
 
     return "End if api"
+
+@app.route('/get/position', methods = ['POST'])
+def getPosition():
+    data = request.get_json()
+    lat = data['lat']
+    long = data['long']
+    resp = requests.get("https://geocode.xyz/" + lat + "," + long + "?json=1&auth=558584188059089175329x4704")
+    json = resp.json()
+    return json
 
 
 
