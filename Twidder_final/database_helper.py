@@ -92,7 +92,7 @@ def get_user_data_by_email(email):
         return data
 
 def get_user_messages_by_token(token):
-    cursor = get_db().execute('select sender, message from message where receiver like (select email from loggedUser where token like ?)', [token])
+    cursor = get_db().execute('select sender, message, place from message where receiver like (select email from loggedUser where token like ?)', [token])
     rows = cursor.fetchall()
     cursor.close()
     if rows==[]:
@@ -100,12 +100,12 @@ def get_user_messages_by_token(token):
     else:
         data = []
         for index in range(len(rows)):
-            data.append({'sender' : rows[index][0], 'message' : rows[index][1]})
+            data.append({'sender' : rows[index][0], 'message' : rows[index][1], 'place' : rows[index][2]})
         return data
 
 
 def get_user_messages_by_email(email):
-    cursor = get_db().execute('select sender, message from message where receiver like ?', [email])
+    cursor = get_db().execute('select sender, message, place from message where receiver like ?', [email])
     rows = cursor.fetchall()
     cursor.close()
     if rows==[]:
@@ -113,7 +113,7 @@ def get_user_messages_by_email(email):
     else:
         data = []
         for index in range(len(rows)):
-            data.append({'sender' : rows[index][0], 'message' : rows[index][1]})
+            data.append({'sender' : rows[index][0], 'message' : rows[index][1], 'place' : rows[index][2]})
         return data
 
 
@@ -129,9 +129,9 @@ def get_email_by_token(token):
                 data.append(rows[index][0])
             return data
 
-def post_message(sender_mail, message, dest_email):
+def post_message(sender_mail, message, dest_email, place):
         try:
-            get_db().execute("insert into message (sender, receiver, message) values(?,?,?)", [sender_mail, dest_email, message])
+            get_db().execute("insert into message (sender, receiver, place, message) values(?,?,?,?)", [sender_mail, dest_email, place, message])
             get_db().commit()
             return True
         except:

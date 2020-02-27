@@ -17,6 +17,12 @@ window.onload = function(){
     document.getElementById("variousMess").style.display = "none";
     infoPerso(token);
     displayOwnMessages(token);
+    var geoActive = document.getElementById("buttGeo");
+    if(geoActive.checked) {
+      getLocation();
+    } else {
+      localStorage.removeItem('place');
+    }
   }
 };
 
@@ -214,6 +220,7 @@ var logOut = function() {
     var signOutResponse = JSON.parse(this.responseText);
     if (signOutResponse.success==true) {
       localStorage.removeItem('token');
+      localStorage.removeItem('place');
       location.reload();
       return window.onload();
     } else {
@@ -263,7 +270,13 @@ var postOwnMessage = function(form) {
   var token = this.localStorage.getItem("token");
   var dest = null;
   var message = form.message.value;
-  var data = {'token' : token, 'message' : message, 'email' : dest};
+  var place;
+  if (localStorage.getItem('place')!=null) {
+    place = localStorage.getItem('place');
+  } else {
+    place = null;
+  }
+  var data = {'token' : token, 'message' : message, 'email' : dest, 'place' : place};
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/post_message', true);
   xhttp.onreadystatechange = function() {
@@ -288,7 +301,13 @@ var postmessageUser = function(form) {
   var token = this.localStorage.getItem("token");
   var dest = searchUser(document.forms["searchuser"]).dest;
   var message = form.message.value;
-  var data = {'token' : token, 'message' : message, 'email' : dest};
+  var place;
+  if (localStorage.getItem('place')!=null) {
+    place = localStorage.getItem('place');
+  } else {
+    place = null;
+  }
+  var data = {'token' : token, 'message' : message, 'email' : dest, 'place' : place};
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/post_message', true);
   xhttp.onreadystatechange = function() {
@@ -324,8 +343,13 @@ var displayOwnMessages = function(token) {
       for(i=0; i < listMessage.length; i++) {
         var writer = listMessage[i].sender;
         var content = listMessage[i].message;
+        var place = listMessage[i].place;
         var aux = document.createElement("li");
-        aux.innerHTML = writer + ":  " + content;
+        if (place!=null) {
+          aux.innerHTML = writer + " -- " + place + ":  " + content;
+        } else {
+          aux.innerHTML = writer + ":  " + content;
+        }
         document.getElementById("wallMessage").appendChild(aux);
       }
     }
@@ -377,8 +401,13 @@ var searchUser = function(form) {
               for(i in userMessagesResponse) {
                 var writer = userMessagesResponse[i].sender;
                 var content = userMessagesResponse[i].message;
+                var place = userMessagesResponse[i].place;
                 var aux = document.createElement("li");
-                aux.innerHTML = writer + ":  " + content;
+                if (place!=null) {
+                  aux.innerHTML = writer + " -- " + place + ":  " + content;
+                } else {
+                  aux.innerHTML = writer + ":  " + content;
+                }
                 document.getElementById("wallMessageUser").appendChild(aux);
               }
              }
@@ -427,48 +456,61 @@ function checkSocket(token){
 
 
 function getLocation() {
-  var x=document.getElementById("demo");
-  if (navigator.geolocation)
-    {
-    navigator.geolocation.getCurrentPosition(showSimplePosition,showErrorPosition);
-    }
-  else{x.innerHTML="Geolocation is not supported by this browser.";}
-};
+  var x=document.getElementById("position");
 
-function showSimplePosition(position) {
-  var x=document.getElementById("demo");
-  var lat = position.coords.latitude.toString();
-  var long = position.coords.longitude.toString();
-  x.innerHTML = "Latitude: " + lat + "<br>Longitude: " + long;
-  var data = {'lat' : lat, 'long' : long};
-  var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", 'get/position', true);
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      var positionResponse = JSON.parse(this.responseText);
-      console.log(positionResponse);
+  var showSimplePosition = function(position) {
+    var x=document.getElementById("position");
+    var lat = position.coords.latitude.toString();
+    var long = position.coords.longitude.toString();
+    var data = {'lat' : lat, 'long' : long};
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", 'get/position', true);
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var positionResponse = JSON.parse(this.responseText);
+        var address = positionResponse.staddress;
+        var city = positionResponse.city;
+        var country = positionResponse.country;
+        var place = city + " - " + country;
+        localStorage.setItem('place', place);
+      }
     }
-  }
-  xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
-  xhttp.send(JSON.stringify(data));
-};
-
-
-function showErrorPosition(error) {
-  var x=document.getElementById("demo");
-  switch(error.code)
-    {
-    case error.PERMISSION_DENIED:
-      x.innerHTML="User denied the request for Geolocation."
-      break;
-    case error.POSITION_UNAVAILABLE:
-      x.innerHTML="Location information is unavailable."
-      break;
-    case error.TIMEOUT:
-      x.innerHTML="The request to get user location timed out."
-      break;
-    case error.UNKNOWN_ERROR:
-      x.innerHTML="An unknown error occurred."
-      break;
-    }
+    xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+    xhttp.send(JSON.stringify(data));
   };
+
+  var showErrorPosition = function(error) {
+    var x=document.getElementById("position");
+    switch(error.code)
+      {
+      case error.PERMISSION_DENIED:
+        x.innerHTML="User denied the request for Geolocation."
+        break;
+      case error.POSITION_UNAVAILABLE:
+        x.innerHTML="Location information is unavailable."
+        break;
+      case error.TIMEOUT:
+        x.innerHTML="The request to get user location timed out."
+        break;
+      case error.UNKNOWN_ERROR:
+        x.innerHTML="An unknown error occurred."
+        break;
+      }
+    };
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showSimplePosition,showErrorPosition);
+    x.innerHTML="Geolocation activated."
+  } else {
+    x.innerHTML="Geolocation is not supported by this browser.";
+  }
+};
+
+var activateGeoloc = function() {
+  if(document.getElementById('buttGeo').checked){
+    getLocation();
+  }else{
+    document.getElementById('position').innerHTML=' ';
+    localStorage.removeItem('place');
+  }
+};
