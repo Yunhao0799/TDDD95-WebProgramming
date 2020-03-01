@@ -11,8 +11,11 @@ import database_helper
 import json
 from flask import jsonify
 import requests
+import string
 # module secrets used for generate token
 import secrets
+# module to send Email
+import smtplib
 
 socketsTab = {}
 
@@ -215,8 +218,46 @@ def getPosition():
 def resetPswd() :
     data = request.get_json()
     email = data['email']
-    if check_if_email_exists(email):
-        blabla
+    if database_helper.check_if_email_exists(email):
+        #create a new secure password#
+        stringSource  = string.ascii_letters + string.digits + string.punctuation
+        password = secrets.choice(string.ascii_lowercase)
+        password += secrets.choice(string.ascii_uppercase)
+        password += secrets.choice(string.digits)
+        for i in range(6):
+            password += secrets.choice(stringSource)
+        char_list = list(password)
+        secrets.SystemRandom().shuffle(char_list)
+        password = ''.join(char_list)
+        print ("New secure Password is ", password)
+        #upload the database with the new password#
+        password_changed = database_helper.change_password(email, password)
+        if password_changed:
+            #send the email#
+            sender = 'test@test.fr'
+            receivers = [email]
+
+            message = """From: The Twidder team
+            To: """ + email + """
+            Subject: New Twidder password
+
+            This is a test e-mail message.
+            Your new password is : """+ password +"""
+
+            The Twidder team
+            """
+            print(message)
+
+            try:
+               smtpObj = smtplib.SMTP('localhost') #problem here
+               smtpObj.sendmail(sender, receivers, message)
+               print("Successfully sent email")
+               return jsonify({'success' : True, 'message' : "Password resetting"})
+            except smtplib.SMTPException:
+               return jsonify({'success' : False, 'message' : "Error: unable to send email"})
+
+        else:
+            return jsonify({'success' : False, 'message' : "Something went wrong changing the password"})
     else :
         return jsonify({'success' : False, 'message' : "Your email does not exist in our database."})
 

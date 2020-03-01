@@ -524,12 +524,15 @@ var resetPswd = function(form){
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var resetPswdResponse = JSON.parse(this.responseText);
+      console.log(resetPswdResponse);
       if(resetPswdResponse.success==false) {
+        document.getElementById('resetMessage').innerHTML=' ';
         document.getElementById("resetMessage").style.display = "block";
         var error = document.createElement('h5');
         error.innerHTML = resetPswdResponse.message;
         document.getElementById("resetMessage").appendChild(error);
       } else {
+        document.getElementById('resetMessage').innerHTML=' ';
         document.getElementById("resetMessage").style.display = "block";
         var success = document.createElement('h4');
         success.innerHTML = resetPswdResponse.message;
@@ -538,4 +541,6 @@ var resetPswd = function(form){
       }
     }
   }
+  xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+  xhttp.send(JSON.stringify(data));
 };
