@@ -10,6 +10,7 @@ from flask import Flask, request, render_template
 import database_helper
 import json
 from flask import jsonify
+import requests
 # module secrets used for generate token
 import secrets
 
@@ -149,19 +150,21 @@ def get_user_messages_by_email():
         return jsonify({'success' : False, 'message' : "You are not signed in."})
 
 
-@app.route('/post_message', methods = ['POST'])  
+@app.route('/post_message', methods = ['POST'])
 def post_message():
     data = request.get_json()
+    print(data)
     current_user_token = data['token']
     message = data['message']
     dest_email = data['email']
+    place = data['place']
     sender_mail = database_helper.get_email_by_token(current_user_token)
     sender_mail = sender_mail[0]
     if dest_email==None:
         dest_email = sender_mail
     if current_user_token != None and dest_email != None:
         if database_helper.check_if_email_exists(sender_mail) and database_helper.check_if_email_exists(dest_email):
-            success_post = database_helper.post_message(sender_mail, message, dest_email)
+            success_post = database_helper.post_message(sender_mail, message, dest_email, place)
             if success_post:
                 return jsonify({'success' : True, 'message' : "Message posted succesfully"})
             else:
@@ -177,10 +180,8 @@ def api():
     if request.environ.get('wsgi.websocket'):
         ws = request.environ['wsgi.websocket']
         token = ws.receive()
-        #print(token)
         aux = database_helper.get_email_by_token(token)
         email = aux[0]
-        #print(email)
         if email in socketsTab:
             oldSocket = socketsTab[email]
             try:
@@ -199,6 +200,15 @@ def api():
                 return "Connection socket failed"
 
     return "End if api"
+
+@app.route('/get/position', methods = ['POST'])
+def getPosition():
+    data = request.get_json()
+    lat = data['lat']
+    long = data['long']
+    resp = requests.get("https://geocode.xyz/" + lat + "," + long + "?json=1&auth=558584188059089175329x4704")
+    json = resp.json()
+    return json
 
 
 
