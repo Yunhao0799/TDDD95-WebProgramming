@@ -211,6 +211,17 @@ def getPosition():
     return json
 
 
+@app.route('/reset_password', methods = ['POST'])
+def resetPswd() :
+    data = request.get_json()
+    email = data['email']
+    if check_if_email_exists(email):
+        blabla
+    else :
+        return jsonify({'success' : False, 'message' : "Your email does not exist in our database."})
+
+
+
 
 
 if __name__ == '__main__':

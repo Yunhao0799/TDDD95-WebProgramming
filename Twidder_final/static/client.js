@@ -514,3 +514,28 @@ var activateGeoloc = function() {
     localStorage.removeItem('place');
   }
 };
+
+
+var resetPswd = function(form){
+  email = form.email.value;
+  data = {"email" : email};
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", '/reset_password', true);
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var resetPswdResponse = JSON.parse(this.responseText);
+      if(resetPswdResponse.success==false) {
+        document.getElementById("resetMessage").style.display = "block";
+        var error = document.createElement('h5');
+        error.innerHTML = resetPswdResponse.message;
+        document.getElementById("resetMessage").appendChild(error);
+      } else {
+        document.getElementById("resetMessage").style.display = "block";
+        var success = document.createElement('h4');
+        success.innerHTML = resetPswdResponse.message;
+        document.getElementById("resetMessage").appendChild(success);
+        document.forms['resetPswd'].reset();
+      }
+    }
+  }
+};
