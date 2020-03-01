@@ -34,16 +34,6 @@ def root():
     return app.send_static_file('client.html')
 
 
-################################################################################
-#                         SECURITY_HELPER_FUNCTIONS                            #
-################################################################################
-# def compare_passwords(username, inputed_password):
-
-
-
-
-
-#######################_END_SECURITY_HELPER_FUNCTIONS_##########################
 
 @app.route('/sign_in', methods = ['PUT'])
 def sign_in():
