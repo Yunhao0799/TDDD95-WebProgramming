@@ -16,6 +16,7 @@ import string
 import secrets
 # module to send Email
 import smtplib
+import ssl
 
 socketsTab = {}
 
@@ -237,8 +238,7 @@ def resetPswd() :
             sender = 'test@test.fr'
             receivers = [email]
 
-            message = """From: The Twidder team
-            To: """ + email + """
+            message = """\
             Subject: New Twidder password
 
             This is a test e-mail message.
@@ -248,13 +248,17 @@ def resetPswd() :
             """
             print(message)
 
+            # Create a secure SSL context
+            context = ssl.create_default_context()
+
             try:
-               smtpObj = smtplib.SMTP('localhost') #problem here
-               smtpObj.sendmail(sender, receivers, message)
-               print("Successfully sent email")
-               return jsonify({'success' : True, 'message' : "Password resetting"})
+                s = smtplib.SMTP('localhost')
+                s.starttls(context=context)
+                s.sendmail(sender, [email], msg.as_string())
+                print("Successfully sent email")
+                return jsonify({'success' : True, 'message' : "Password resetting"})
             except smtplib.SMTPException:
-               return jsonify({'success' : False, 'message' : "Error: unable to send email"})
+                return jsonify({'success' : False, 'message' : "Error: unable to send email"})
 
         else:
             return jsonify({'success' : False, 'message' : "Something went wrong changing the password"})
