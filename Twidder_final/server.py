@@ -14,13 +14,20 @@ import requests
 import string
 # module secrets used for generate token
 import secrets
+
 # module to send Email
 import smtplib
-import ssl
+import email.utils
+from email.mime.text import MIMEText
+#other solution for mails
+from flask_mail import Mail
+from flask_mail import Message
 
 socketsTab = {}
 
 app = Flask(__name__)
+
+mail = Mail(app)
 
 app.debug = True
 
@@ -220,6 +227,7 @@ def resetPswd() :
     data = request.get_json()
     email = data['email']
     if database_helper.check_if_email_exists(email):
+
         #create a new secure password#
         stringSource  = string.ascii_letters + string.digits + string.punctuation
         password = secrets.choice(string.ascii_lowercase)
@@ -231,30 +239,39 @@ def resetPswd() :
         secrets.SystemRandom().shuffle(char_list)
         password = ''.join(char_list)
         print ("New secure Password is ", password)
+
         #upload the database with the new password#
         password_changed = database_helper.change_password(email, password)
         if password_changed:
+
             #send the email#
-            sender = 'test@test.fr'
+            sender = 'test@localhost'
             receivers = [email]
 
             message = """\
-            Subject: New Twidder password
+Dear user,
+Your new password is : """+ password +"""
 
-            This is a test e-mail message.
-            Your new password is : """+ password +"""
+The Twidder team"""
 
-            The Twidder team
-            """
-            print(message)
-
-            # Create a secure SSL context
-            context = ssl.create_default_context()
 
             try:
-                s = smtplib.SMTP('localhost')
-                s.starttls(context=context)
-                s.sendmail(sender, [email], msg.as_string())
+                # Create the message
+                msg = Message(subject='New Twidder password',
+                              body= message,
+                              sender="marie.dralliag@gmail.com",
+                              recipients=[email])
+                print(msg)
+                mail.send(msg)
+                #msg = MIMEText(message)
+                #msg['From'] = sender
+                #msg['To'] = ", ".join(receivers)
+                #msg['Subject'] = 'New Twidder password'
+                #print(msg.as_string())
+                #server = smtplib.SMTP('localhost', 5000)
+                #print("server creating")
+                #server.sendmail(sender, receivers, msg.as_string())
+                #server.quit()
                 print("Successfully sent email")
                 return jsonify({'success' : True, 'message' : "Password resetting"})
             except smtplib.SMTPException:
