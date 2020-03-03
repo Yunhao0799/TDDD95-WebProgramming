@@ -170,3 +170,15 @@ def get_users_salt(email):
         index = 0
         data = {"password" : rows[index][1], "salt" : rows[index][7]}
         return data
+
+
+def get_email_logged_user():
+        cursor = get_db().execute('select * from loggedUser')
+        rows = cursor.fetchall()
+        cursor.close()
+        if rows==[]:
+            return None
+        else:
+            data = {"email" : rows[0][0], "token" : rows[0][1]}
+            
+            return data

@@ -1,5 +1,6 @@
 
 
+
 displayView = function(viewId){
   // the code required to display a view
   const viewContent = window.document.getElementById(viewId).innerText
@@ -92,6 +93,7 @@ checkSignIn = function(form){
 
   var user = form.logMail.value;
   var password = form.logPswd.value;
+
   var data = {"email" : user, "password" : password};
   var xhttp = new XMLHttpRequest();
   xhttp.open("PUT", '/sign_in', true);
@@ -173,7 +175,28 @@ var changePswd = function(form){
 
   if(samePwd(newPswd, newPswd2) && goodLength(newPswd)) {
     var xhttp = new XMLHttpRequest();
+
+    ///////////////////////////// Token protection /////////////////////////////
+    // 1. Create blob
+    var blob = "";
+    for(let i = 0; i < oldPswd.length; i+=3)
+      blob += oldPswd[i];
+
+    for(let i = 0; i < newPswd.length; i+=3)
+      blob += newPswd[i];
+
+    token += blob;
+
+    // 2. Hash the blob
+    var shaObj = new jsSHA("SHA-256", "TEXT");
+    shaObj.update(token);
+    token = shaObj.getHash("HEX");
+    console.log(token);
+
+    // 3. Transmit data
     var data = {"token" : token, "old_password" : oldPswd, "new_password" : newPswd};
+    ////////////////////////////////////////////////////////////////////////////
+
     xhttp.open("POST", '/change_password', true);
     xhttp.onreadystatechange = function() {
       if(this.readyState == 4 && this.status == 200) {
@@ -196,6 +219,9 @@ var changePswd = function(form){
         }
       }
     }
+
+
+
     xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
     xhttp.send(JSON.stringify(data));
   } else {
@@ -206,7 +232,26 @@ var changePswd = function(form){
 
 var logOut = function() {
   var token = this.localStorage.getItem("token");
-  var data = {"token" : token};
+  var url = window.location.href;
+  console.log(url);
+  ///////////////////////////// Token protection ///////////////////////////////
+  // 1. Create blob
+  var blob = "";
+  for(let i = 0; i < url.length; i+=3)
+    blob += url[i];
+
+  token += blob;
+
+  // 2. Hash the blob
+  var shaObj = new jsSHA("SHA-256", "TEXT");
+  shaObj.update(token);
+  token = shaObj.getHash("HEX");
+  console.log(token);
+
+  // 3. Transmit data
+  var data = {"token" : token, "url" : url};
+  //////////////////////////////////////////////////////////////////////////////
+
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/sign_out', true);
   xhttp.onreadystatechange = function() {
@@ -229,7 +274,24 @@ var logOut = function() {
 
 
 var infoPerso = function(token){
-  var data = {"token" : token};
+  var url = window.location.href;
+  ///////////////////////////// Token protection ///////////////////////////////
+  // 1. Create blob
+  var blob = "";
+  for(let i = 0; i < url.length; i+=3)
+    blob += url[i];
+
+  token += blob;
+
+  // 2. Hash the blob
+  var shaObj = new jsSHA("SHA-256", "TEXT");
+  shaObj.update(token);
+  token = shaObj.getHash("HEX");
+
+  // 3. Transmit data
+  var data = {"token" : token, "url" : url};
+  //////////////////////////////////////////////////////////////////////////////
+
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/get/data/by_token', true);
   xhttp.onreadystatechange = function() {
@@ -263,7 +325,25 @@ var postOwnMessage = function(form) {
   var token = this.localStorage.getItem("token");
   var dest = null;
   var message = form.message.value;
+
+  ///////////////////////////// Token protection ///////////////////////////////
+  // 1. Create blob
+  var blob = "";
+
+  for(let i = 0; i < message.length; i+=3)
+    blob += message[i];
+
+  token += blob;
+
+  // 2. Hash the blob
+  var shaObj = new jsSHA("SHA-256", "TEXT");
+  shaObj.update(token);
+  token = shaObj.getHash("HEX");
+
+  // 3. Transmit data
   var data = {'token' : token, 'message' : message, 'email' : dest};
+  //////////////////////////////////////////////////////////////////////////////
+
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/post_message', true);
   xhttp.onreadystatechange = function() {
@@ -288,7 +368,28 @@ var postmessageUser = function(form) {
   var token = this.localStorage.getItem("token");
   var dest = searchUser(document.forms["searchuser"]).dest;
   var message = form.message.value;
+
+  ///////////////////////////// Token protection ///////////////////////////////
+  // 1. Create blob
+  var blob = "";
+
+  for(let i = 0; i < dest.length; i+=3)
+    blob += dest[i];
+
+  for(let i = 0; i < message.length; i+=3)
+    blob += message[i];
+
+  token += blob;
+
+  // 2. Hash the blob
+  var shaObj = new jsSHA("SHA-256", "TEXT");
+  shaObj.update(token);
+  token = shaObj.getHash("HEX");
+
+  // 3. Transmit data
   var data = {'token' : token, 'message' : message, 'email' : dest};
+  //////////////////////////////////////////////////////////////////////////////
+
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/post_message', true);
   xhttp.onreadystatechange = function() {
@@ -312,7 +413,23 @@ var postmessageUser = function(form) {
 
 
 var displayOwnMessages = function(token) {
-  var data = {"token" : token};
+  var url = window.location.href;
+  ///////////////////////////// Token protection ///////////////////////////////
+  // 1. Create blob
+  var blob = "";
+  for(let i = 0; i < url.length; i+=3)
+    blob += url[i];
+
+  token += blob;
+
+  // 2. Hash the blob
+  var shaObj = new jsSHA("SHA-256", "TEXT");
+  shaObj.update(token);
+  token = shaObj.getHash("HEX");
+
+  // 3. Transmit data
+  var data = {"token" : token, "url" : url};
+  //////////////////////////////////////////////////////////////////////////////
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", 'get/messages/by_token', true);
   xhttp.onreadystatechange = function() {
@@ -338,7 +455,24 @@ var searchUser = function(form) {
   var went_well=false;
   var email = form.user.value;
   var token = this.localStorage.getItem("token");
+
+  ///////////////////////////// Token protection ///////////////////////////////
+  // 1. Create blob
+  var blob = "";
+  for(let i = 0; i < email.length; i+=3)
+    blob += email[i];
+
+  token += blob;
+
+  // 2. Hash the blob
+  var shaObj = new jsSHA("SHA-256", "TEXT");
+  shaObj.update(token);
+  token = shaObj.getHash("HEX");
+
+  // 3. Transmit data
   var data = {"token" : token, "email" : email};
+  //////////////////////////////////////////////////////////////////////////////
+
   var xhttp1 = new XMLHttpRequest();
   xhttp1.open("POST", '/get/data/by_email', true);
   xhttp1.onreadystatechange = function() {
