@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Twidder</title>
+    <link href="/static/client.css" type="text/css" rel="stylesheet">
+    <script src="/static/client.js" type="text/javascript"></script>
+    </head>
+
+    <div class="content">
+
+      <div class="conteneur_client">
+        <h4>Reset your password:</h4>
+        <form action="{{ url_for('resetPswd') }}" method="POST">
+          {{ form.csrf_token }}
+          <dl>
+            <label>Your email: </label>
+            {{ form.email(size=20, placeholder="email@email.com") }}
+          </dl>
+          <button class="submit" type="submit">Send Email</button>
+          <div id="resetMessage" style="display:none"> </div>
+        </form>
+        <br/>
+        <a href="/"><button type="button" name="button" class="logOutButton">Go back to the welcome page</button></a>
+      </div>
+
+    </div>
