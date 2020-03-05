@@ -376,13 +376,39 @@ def get_user_messages_by_email():
     token = data['token']
     email = data['email']
     if token != None:
-        if email != None:
-            result = database_helper.get_user_messages_by_email(email)
-            if result==None:
-                return jsonify({'success' : False, 'message' : "No message with requested email"})
-            return jsonify(result)
+        authentication_data = database_helper.get_email_logged_user()
+        stored_token = authentication_data['token']
+        equal_hashed_token = False
+        ########################## Token verification ##########################
+        # 1. Recreate the blob using the stored token
+        blob = ""
+        i = 0
+        while i < len(email):
+            blob = blob + email[i]
+            i = i + 3
+
+        blob = stored_token + blob
+
+        # 2. Hash it
+        hash = hashlib.sha256(blob.encode()).hexdigest()
+
+        # 3. Compare the two hashes
+        if token == hash:
+            equal_hashed_token = True
+            print("Equal hashes get_users_data_by_token")
+
+        ########################################################################
+        if equal_hashed_token:
+            if email != None:
+                result = database_helper.get_user_messages_by_email(email)
+                if result==None:
+                    return jsonify({'success' : False, 'message' : "No message with requested email"})
+                return jsonify(result)
+            else:
+                return jsonify({'success' : False, 'message' : "Email has to be provided"})
         else:
-            return jsonify({'success' : False, 'message' : "Email has to be provided"})
+            return jsonify({'success' : False, 'message' : "Hashes not equal get_user_messages_by_email"})
+
     else:
         return jsonify({'success' : False, 'message' : "You are not signed in."})
 
