@@ -41,7 +41,7 @@ bcrypt = Bcrypt(app)
 #32 bytes salt
 
 mail = Mail(app)
-app.config['SECRET_KEY'] = 'uhu'
+app.config['SECRET_KEY'] = b'_5#y2L"F4Q8z\n\xec]/'
 
 app.debug = True
 
@@ -541,9 +541,12 @@ def resetPswd() :
             password = ''.join(char_list)
             print ("New secure Password is ", password)
 
-            #upload the database with the new password# ??Doesn't work now !!!
-            #password_changed = database_helper.change_password(emailDest, password, salt)
-            password_changed = True
+            #upload the database with the new password# 
+            resultSalt= database_helper.get_users_salt(emailDest)
+            salt = resultSalt['salt']
+            print(salt)
+            password_changed = database_helper.change_password(emailDest, password, salt)
+            #password_changed = True
             if password_changed:
                 #send the email#
                 message = """\

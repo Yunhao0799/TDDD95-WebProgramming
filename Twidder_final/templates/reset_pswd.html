@@ -12,7 +12,7 @@
           <ul class=flashes>
           {% for category, message in messages %}
             <li class="{{ category }} alert-dismissible">
-              <a href="/reset_password" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+              <a href="/reset_password" class="close" data-dismiss="alert" aria-label="close" style="text-decoration:none">&times;</a>
               {{ message }}
             </li>
           {% endfor %}
