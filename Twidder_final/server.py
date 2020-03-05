@@ -6,7 +6,7 @@
 
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, flash
 import database_helper
 import json
 from flask import jsonify
@@ -29,6 +29,10 @@ from email.mime.text import MIMEText
 #other solution for mails
 from flask_mail import Mail
 from flask_mail import Message
+#manage a form
+from flask_wtf import Form
+from wtforms import StringField
+from wtforms.validators import DataRequired, Email, Length
 
 socketsTab = {}
 
@@ -37,6 +41,7 @@ bcrypt = Bcrypt(app)
 #32 bytes salt
 
 mail = Mail(app)
+app.config['SECRET_KEY'] = 'uhu'
 
 app.debug = True
 
@@ -114,7 +119,7 @@ def sign_out(token = None):
     if token==None:
         return jsonify({'success' : False, 'message' : "You are not signed in."})
 
-        
+
     url = data['url']
     authentication_data = database_helper.get_email_logged_user()
     stored_token = authentication_data['token']
@@ -235,7 +240,7 @@ def change_password():
                 return jsonify({'success' : True, 'message' : "Password succesfully changed"})
             else:
                 return jsonify({'success' : False, 'message' : "Something went wrong changing the password"})
-        
+
         else:
             print("hashes are not the same")
             return jsonify({'success' : False, 'message' : "The hashes is not the same"})
@@ -395,7 +400,7 @@ def post_message():
     message = data['message']
     dest_email = data['email']
     place = data['place']
-    
+
     authentication_data = database_helper.get_email_logged_user()
     stored_token = authentication_data['token']
     sender_mail = database_helper.get_email_by_token(stored_token)
@@ -486,65 +491,62 @@ def getPosition():
     return json
 
 
-@app.route('/reset_password', methods = ['POST'])
+
+class EmailForm(Form):
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(min=6, max=60)])
+
+@app.route('/reset_password', methods = ['GET', 'POST'])
 def resetPswd() :
-    data = request.get_json()
-    email = data['email']
-    if database_helper.check_if_email_exists(email):
+    form = EmailForm()
+    if form.validate_on_submit():
+        emailDest = form.email.data
+        print(emailDest)
+        if database_helper.check_if_email_exists(emailDest):
 
-        #create a new secure password#
-        stringSource  = string.ascii_letters + string.digits + string.punctuation
-        password = secrets.choice(string.ascii_lowercase)
-        password += secrets.choice(string.ascii_uppercase)
-        password += secrets.choice(string.digits)
-        for i in range(6):
-            password += secrets.choice(stringSource)
-        char_list = list(password)
-        secrets.SystemRandom().shuffle(char_list)
-        password = ''.join(char_list)
-        print ("New secure Password is ", password)
+            #create a new secure password#
+            stringSource  = string.ascii_letters + string.digits + string.punctuation
+            password = secrets.choice(string.ascii_lowercase)
+            password += secrets.choice(string.ascii_uppercase)
+            password += secrets.choice(string.digits)
+            for i in range(6):
+                password += secrets.choice(stringSource)
+            char_list = list(password)
+            secrets.SystemRandom().shuffle(char_list)
+            password = ''.join(char_list)
+            print ("New secure Password is ", password)
 
-        #upload the database with the new password#
-        password_changed = database_helper.change_password(email, password)
-        if password_changed:
-
-            #send the email#
-            sender = 'test@localhost'
-            receivers = [email]
-
-            message = """\
+            #upload the database with the new password#
+            password_changed = database_helper.change_password(emailDest, password)
+            if password_changed:
+                #send the email#
+                message = """\
 Dear user,
 Your new password is : """+ password +"""
 
 The Twidder team"""
+                msg = MIMEText(message)
+                msg['To'] = email.utils.formataddr((emailDest, emailDest))
+                msg['From'] = email.utils.formataddr(('Twidder team', 'noreply.twidder.liu@gmail.com'))
+                msg['Subject'] = 'New Twidder password'
 
-
-            try:
-                # Create the message
-                msg = Message(subject='New Twidder password',
-                              body= message,
-                              sender="marie.dralliag@gmail.com",
-                              recipients=[email])
-                print(msg)
-                mail.send(msg)
-                #msg = MIMEText(message)
-                #msg['From'] = sender
-                #msg['To'] = ", ".join(receivers)
-                #msg['Subject'] = 'New Twidder password'
-                #print(msg.as_string())
-                #server = smtplib.SMTP('localhost', 5000)
-                #print("server creating")
-                #server.sendmail(sender, receivers, msg.as_string())
-                #server.quit()
-                print("Successfully sent email")
-                return jsonify({'success' : True, 'message' : "Password resetting"})
-            except smtplib.SMTPException:
-                return jsonify({'success' : False, 'message' : "Error: unable to send email"})
-
-        else:
-            return jsonify({'success' : False, 'message' : "Something went wrong changing the password"})
-    else :
-        return jsonify({'success' : False, 'message' : "Your email does not exist in our database."})
+                try:
+                    # --- send the email ---
+                    server = smtplib.SMTP('smtp.gmail.com', 587)
+                    server.starttls() #enable security
+                    server.login ('noreply.twidder.liu@gmail.com', 'liuTDDD97!')  #login and pswd of the email account
+                    # Dump communication with the receiving server straight to to the console.
+                    server.set_debuglevel(True)
+                    server.sendmail('noreply.twidder.liu@gmail.com', [emailDest], msg.as_string())
+                    flash("An email has been sending to you.")
+                except smtplib.SMTPException:
+                    flash("Error: unable to send email")
+                finally:
+                    server.quit()
+            else:
+                flash("Something went wrong changing the password")
+        else :
+            flash("Your email does not exist in our database.")
+    return render_template('reset_pswd.html', form=form)
 
 
 
