@@ -56,7 +56,7 @@ def root():
 def sign_in():
     data = request.get_json()
     email = data['email']
-       inputed_password = data['password']
+    inputed_password = data['password']
 
     ########################### Password validation ############################
     # 1. Retrive user's salt from the database
