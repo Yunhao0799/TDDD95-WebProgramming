@@ -7,6 +7,18 @@
     </head>
 
     <div class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class=flashes>
+          {% for category, message in messages %}
+            <li class="{{ category }} alert-dismissible">
+              <a href="/reset_password" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+              {{ message }}
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
 
       <div class="conteneur_client">
         <h4>Reset your password:</h4>
@@ -17,7 +29,6 @@
             {{ form.email(size=20, placeholder="email@email.com") }}
           </dl>
           <button class="submit" type="submit">Send Email</button>
-          <div id="resetMessage" style="display:none"> </div>
         </form>
         <br/>
         <a href="/"><button type="button" name="button" class="logOutButton">Go back to the welcome page</button></a>

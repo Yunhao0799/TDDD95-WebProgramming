@@ -476,7 +476,7 @@ var searchUser = function(form) {
   var went_well=false;
   var email = form.user.value;
   var token = this.localStorage.getItem("token");
-  
+
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
@@ -647,6 +647,7 @@ var activateGeoloc = function() {
 };
 
 
+//useless
 var resetPswd = function(form){
   email = form.email.value;
   data = {"email" : email};

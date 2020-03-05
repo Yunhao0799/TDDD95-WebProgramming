@@ -6,7 +6,7 @@
 
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
-from flask import Flask, request, render_template, flash
+from flask import Flask, request, render_template, flash, redirect, url_for
 import database_helper
 import json
 from flask import jsonify
@@ -541,8 +541,9 @@ def resetPswd() :
             password = ''.join(char_list)
             print ("New secure Password is ", password)
 
-            #upload the database with the new password#
-            password_changed = database_helper.change_password(emailDest, password)
+            #upload the database with the new password# ??Doesn't work now !!!
+            #password_changed = database_helper.change_password(emailDest, password, salt)
+            password_changed = True
             if password_changed:
                 #send the email#
                 message = """\
@@ -563,15 +564,20 @@ The Twidder team"""
                     # Dump communication with the receiving server straight to to the console.
                     server.set_debuglevel(True)
                     server.sendmail('noreply.twidder.liu@gmail.com', [emailDest], msg.as_string())
-                    flash("An email has been sending to you.")
+                    flash("An email has been sending to you.", 'success')
+                    print('boolean_success')
+                    #return redirect(url_for('root'))
                 except smtplib.SMTPException:
-                    flash("Error: unable to send email")
+                    print('error')
+                    flash("Error: unable to send email", 'error')
                 finally:
                     server.quit()
             else:
-                flash("Something went wrong changing the password")
+                print('error pswd change')
+                flash("Something went wrong changing the password", 'error')
         else :
-            flash("Your email does not exist in our database.")
+            print('error form')
+            flash("Your email does not exist in our database.", 'error')
     return render_template('reset_pswd.html', form=form)
 
 
