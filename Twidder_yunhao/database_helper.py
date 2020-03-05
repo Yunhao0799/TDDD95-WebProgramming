@@ -8,7 +8,7 @@
 # E.g. Implementing sign_in() in server.py shall involve a call to             #
 # find_user() implemented in database_helper.py .                              #
 ################################################################################
-
+ 
 
 import sqlite3
 from flask import Flask, g, request
@@ -180,5 +180,5 @@ def get_email_logged_user():
             return None
         else:
             data = {"email" : rows[0][0], "token" : rows[0][1]}
-            
+
             return data

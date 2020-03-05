@@ -13,7 +13,7 @@ from flask import jsonify
 # module secrets used for generate token
 import secrets
 
-socketsTab = {}
+socketsTab = {} 
 
 app = Flask(__name__)
 
@@ -149,7 +149,7 @@ def get_user_messages_by_email():
         return jsonify({'success' : False, 'message' : "You are not signed in."})
 
 
-@app.route('/post_message', methods = ['POST'])  
+@app.route('/post_message', methods = ['POST'])
 def post_message():
     data = request.get_json()
     current_user_token = data['token']

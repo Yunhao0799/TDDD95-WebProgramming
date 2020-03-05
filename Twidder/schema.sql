@@ -7,6 +7,6 @@
 -- procedures.                                                                --
 --------------------------------------------------------------------------------
 
-create table users(email varchar(30), password varchar(30), firstname varchar(20), familyname varchar(50), gender varchar(10), city varchar(30), country varchar(30), primary key(email), UNIQUE(email));
+create table users(email varchar(30), password varchar(30), firstname varchar(20), familyname varchar(50), gender varchar(10), city varchar(30), country varchar(30), salt varchar(32), primary key(email), UNIQUE(email));
 create table message(messageId integer primary key autoincrement, sender varchar(30), receiver varchar(30), message varchar(500));
 create table loggedUser(email varchar(30), token varchar(16), primary key(email), UNIQUE(email));

@@ -53,9 +53,9 @@ def link_token_to_user(email, token):
     except:
         return False
 
-def save_new_user(email, password, firstname, familyname, gender, city, country):
+def save_new_user(email, password, firstname, familyname, gender, city, country, salt):
     try:
-        get_db().execute("insert into users values(?,?,?,?,?,?,?)", [email, password, firstname, familyname, gender, city, country])
+        get_db().execute("insert into users values(?,?,?,?,?,?,?,?)", [email, password, firstname, familyname, gender, city, country, salt])
         get_db().commit()
         return True
     except:
@@ -151,10 +151,34 @@ def check_if_email_exists(email):
         return True
 
 
-def change_password(email, new_password):
+def change_password(email, new_password, salt):
     try:
-        get_db().execute("update users set password=? where email=?;", [new_password, email])
+        get_db().execute("update users set password=?,salt=? where email=?;", [new_password, salt, email])
         get_db().commit()
         return True
     except:
         return False
+
+
+def get_users_salt(email):
+    cursor = get_db().execute('select * from users where email like ?', [email])
+    rows = cursor.fetchall()
+    cursor.close()
+    if rows==[]:
+        return None
+    else:
+        index = 0
+        data = {"password" : rows[index][1], "salt" : rows[index][7]}
+        return data
+
+
+def get_email_logged_user():
+        cursor = get_db().execute('select * from loggedUser')
+        rows = cursor.fetchall()
+        cursor.close()
+        if rows==[]:
+            return None
+        else:
+            data = {"email" : rows[0][0], "token" : rows[0][1]}
+
+            return data
