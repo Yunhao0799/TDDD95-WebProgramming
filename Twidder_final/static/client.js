@@ -695,7 +695,6 @@ function drop(ev) {
   console.log(message); //the id of the element
   //delete a message
   if (ev.target == document.getElementById("trash")) {
-      ev.target.appendChild(document.getElementById(message)); //at the end of the function ??
       data = {"id" : message};
       var xhttp = new XMLHttpRequest();
       xhttp.open("POST", '/delete_message', true);
