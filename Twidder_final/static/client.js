@@ -438,14 +438,11 @@ var displayOwnMessages = function(token) {
   for(let i = 0; i < url.length; i+=3) {
     blob += url[i];
   }
-
   token += blob;
-
   // 2. Hash the blob
   var shaObj = new jsSHA("SHA-256", "TEXT");
   shaObj.update(token);
   token = shaObj.getHash("HEX");
-
   // 3. Transmit data
   var data = {"token" : token, "url" : url};
   //////////////////////////////////////////////////////////////////////////////
@@ -454,14 +451,17 @@ var displayOwnMessages = function(token) {
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var listMessage = JSON.parse(this.responseText);
-      //console.log(listMessage);
       document.getElementById('wallMessage').innerHTML = " ";
       var i;
       for(i=0; i < listMessage.length; i++) {
         var writer = listMessage[i].sender;
         var content = listMessage[i].message;
         var place = listMessage[i].place;
+        var id = listMessage[i].id;
         var aux = document.createElement("li");
+        aux.setAttribute("id", id);
+        aux.setAttribute("draggable", "true");
+        aux.setAttribute("ondragstart", "drag(event)");
         if (place!=null) {
           aux.innerHTML = writer + " -- " + place + ":  " + content;
         } else {
@@ -678,4 +678,50 @@ var resetPswd = function(form){
   }
   xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
   xhttp.send(JSON.stringify(data));
+};
+
+
+function allowDrop(ev) {
+  ev.preventDefault();
+};
+
+function drag(ev) {
+  ev.dataTransfer.setData("text", ev.target.id);
+};
+
+function drop(ev) {
+  ev.preventDefault();
+  var message = ev.dataTransfer.getData("text");
+  console.log(message); //the id of the element
+  //delete a message
+  if (ev.target == document.getElementById("trash")) {
+      ev.target.appendChild(document.getElementById(message)); //at the end of the function ??
+      data = {"id" : message};
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("POST", '/delete_message', true);
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          var deleteMessResponse = JSON.parse(this.responseText);
+          console.log(deleteMessResponse);
+          if(deleteMessResponse.success==false) {  //error
+            document.getElementById('deleteMessage').innerHTML=' ';
+            document.getElementById("deleteMessage").style.display = "block";
+            var error = document.createElement('h5');
+            error.innerHTML = deleteMessResponse.message;
+            document.getElementById("deleteMessage").appendChild(error);
+          } else {
+            ev.target.appendChild(document.getElementById(message)); //here ??
+          }
+        }
+      }
+      xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
+      xhttp.send(JSON.stringify(data));
+
+  //drag and drop a message into the textarea
+  } else {
+    //create a clone of the message -> doesn't work
+    var clone = document.getElementById(message).cloneNode(true);
+    clone.id = clone.id + (new Date()).getMilliseconds();
+    ev.target.appendChild(clone);
+  }
 };

@@ -580,6 +580,16 @@ The Twidder team"""
 
 
 
+@app.route('/delete_message', methods = ['POST'])
+def delete_message():
+    data = request.get_json()
+    idMessage = data['id']
+    result = database_helper.deleteOwnMessage(idMessage)
+    if result:
+        return jsonify({'success' : True, 'message' : 'Message succesfully deleted'})
+    else :
+        return jsonify({'success' : False, 'message' : "Something went wrong deleting the message"})
+
 
 
 if __name__ == '__main__':

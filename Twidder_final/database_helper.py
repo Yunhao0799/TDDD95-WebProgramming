@@ -92,7 +92,7 @@ def get_user_data_by_email(email):
         return data
 
 def get_user_messages_by_token(token):
-    cursor = get_db().execute('select sender, message, place from message where receiver like (select email from loggedUser where token like ?)', [token])
+    cursor = get_db().execute('select sender, message, place, messageId from message where receiver like (select email from loggedUser where token like ?)', [token])
     rows = cursor.fetchall()
     cursor.close()
     if rows==[]:
@@ -100,12 +100,12 @@ def get_user_messages_by_token(token):
     else:
         data = []
         for index in range(len(rows)):
-            data.append({'sender' : rows[index][0], 'message' : rows[index][1], 'place' : rows[index][2]})
+            data.append({'sender' : rows[index][0], 'message' : rows[index][1], 'place' : rows[index][2], 'id' : rows[index][3]})
         return data
 
 
 def get_user_messages_by_email(email):
-    cursor = get_db().execute('select sender, message, place from message where receiver like ?', [email])
+    cursor = get_db().execute('select sender, message, place, messageId from message where receiver like ?', [email])
     rows = cursor.fetchall()
     cursor.close()
     if rows==[]:
@@ -113,7 +113,7 @@ def get_user_messages_by_email(email):
     else:
         data = []
         for index in range(len(rows)):
-            data.append({'sender' : rows[index][0], 'message' : rows[index][1], 'place' : rows[index][2]})
+            data.append({'sender' : rows[index][0], 'message' : rows[index][1], 'place' : rows[index][2], 'id' : rows[index][3]})
         return data
 
 
@@ -136,6 +136,14 @@ def post_message(sender_mail, message, dest_email, place):
             return True
         except:
             return False
+
+def deleteOwnMessage(id):
+    try :
+        get_db().execute("delete from message where messageId like ?", [id])
+        get_db().commit()
+        return True
+    except:
+        return False
 
 
 def check_if_email_exists(email):
