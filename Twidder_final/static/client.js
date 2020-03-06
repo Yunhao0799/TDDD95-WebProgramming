@@ -689,12 +689,13 @@ function drop(ev) {
       }
       xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
       xhttp.send(JSON.stringify(data));
-  //drag and drop a message into the textarea
   } else {
-    //create a clone of the message -> doesn't work
+    //add an existing message into the textarea
     var clone = document.getElementById(message).cloneNode(true);
     clone.id = clone.id + (new Date()).getMilliseconds();
-    ev.target.appendChild(clone);
+    var text = clone.innerHTML.split(": ");
+    text = text[text.length-1];
+    document.getElementById(ev.target.id).innerHTML = text;
   }
 };
 
