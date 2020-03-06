@@ -1,13 +1,12 @@
-
-
+// the code required to display a view
 displayView = function(viewId){
-  // the code required to display a view
   const viewContent = window.document.getElementById(viewId).innerText
   window.document.getElementById('content').innerHTML = viewContent
 };
 
+//---------------------------------------------
+//code that is executed as the page is loaded.
 window.onload = function(){
-  //code that is executed as the page is loaded.
   if(this.localStorage.getItem("token") === null) {
     displayView('welcomeview');
   } else {
@@ -26,7 +25,8 @@ window.onload = function(){
   }
 };
 
-
+//---------------------------------------------
+//function to signUp
 checkSignup = function(form) {
   var goodLength = function(password) {
     if(password.value.length < 5) {
@@ -65,7 +65,6 @@ checkSignup = function(form) {
     xhttp.onreadystatechange = function() {
       if(this.readyState == 4 && this.status == 200) {
         var signUpResponse = JSON.parse(this.responseText);
-        //console.log(signUpResponse);
         if(signUpResponse.success==false) {
           document.getElementById("errorSignup").innerHTML = "";
           document.getElementById("errorSignup").style.display = "block";
@@ -95,9 +94,9 @@ checkSignup = function(form) {
   };
 };
 
-
+//---------------------------------------------
+//function to sign in
 checkSignIn = function(form){
-
   var user = form.logMail.value;
   var password = form.logPswd.value;
   var data = {"email" : user, "password" : password};
@@ -107,7 +106,6 @@ checkSignIn = function(form){
     if(this.readyState == 4 && this.status == 200) {
     var signInResponse = JSON.parse(this.responseText);
     if (signInResponse.success == true) {
-      //console.log(signInResponse);
       localStorage.setItem("token", signInResponse.message);
       return window.onload();
     } else {
@@ -124,6 +122,8 @@ checkSignIn = function(form){
   xhttp.send(JSON.stringify(data));
 };
 
+//---------------------------------------------
+//function to display the different tabs
 function openTab(evt, tabName, element){
   var i;
   var tabs = document.getElementsByClassName("tab");
@@ -138,11 +138,10 @@ function openTab(evt, tabName, element){
   document.getElementById(tabName).style.display = "block";
   evt.currentTarget.className += " highlighted";
 };
-//The function hides all elements with the class name "tab" (display="none"), and displays the element with the given tab name (display="block");
 
-
+//---------------------------------------------
+//function to change password
 var changePswd = function(form){
-
   var oldPswd = form.oldPswd.value;
   var newPswd = form.newPswd.value;
   var newPswd2 = form.newPswd2.value;
@@ -178,36 +177,29 @@ var changePswd = function(form){
       return true;
     }
   };
-
   if(samePwd(newPswd, newPswd2) && goodLength(newPswd)) {
     var xhttp = new XMLHttpRequest();
-
     ///////////////////////////// Token protection /////////////////////////////
     // 1. Create blob
     var blob = "";
-    for(let i = 0; i < oldPswd.length; i+=3)
+    for(let i = 0; i < oldPswd.length; i+=3) {
       blob += oldPswd[i];
-
-    for(let i = 0; i < newPswd.length; i+=3)
+    }
+    for(let i = 0; i < newPswd.length; i+=3) {
       blob += newPswd[i];
-
+    }
     token += blob;
-
     // 2. Hash the blob
     var shaObj = new jsSHA("SHA-256", "TEXT");
     shaObj.update(token);
     token = shaObj.getHash("HEX");
-    console.log(token);
-
     // 3. Transmit data
     var data = {"token" : token, "old_password" : oldPswd, "new_password" : newPswd};
     ////////////////////////////////////////////////////////////////////////////
-
     xhttp.open("POST", '/change_password', true);
     xhttp.onreadystatechange = function() {
       if(this.readyState == 4 && this.status == 200) {
         var changePswdResponse = JSON.parse(this.responseText);
-        //console.log(changePswdResponse);
         if(changePswdResponse.success==false) {
           document.getElementById("errorNewPass").style.display = "block";
           document.getElementById("okChange").style.display = "none";
@@ -225,9 +217,6 @@ var changePswd = function(form){
         }
       }
     }
-
-
-
     xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
     xhttp.send(JSON.stringify(data));
   } else {
@@ -235,29 +224,25 @@ var changePswd = function(form){
   };
 };
 
-
+//---------------------------------------------
+//log out function
 var logOut = function() {
   var token = this.localStorage.getItem("token");
   var url = window.location.href;
-  console.log(url);
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
-  for(let i = 0; i < url.length; i+=3)
+  for(let i = 0; i < url.length; i+=3) {
     blob += url[i];
-
+  }
   token += blob;
-
   // 2. Hash the blob
   var shaObj = new jsSHA("SHA-256", "TEXT");
   shaObj.update(token);
   token = shaObj.getHash("HEX");
-  console.log(token);
-
   // 3. Transmit data
   var data = {"token" : token, "url" : url};
   //////////////////////////////////////////////////////////////////////////////
-
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/sign_out', true);
   xhttp.onreadystatechange = function() {
@@ -279,32 +264,29 @@ var logOut = function() {
   xhttp.send(JSON.stringify(data));
 };
 
-
+//---------------------------------------------
+//function to display our own personal information
 var infoPerso = function(token){
   var url = window.location.href;
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
-  for(let i = 0; i < url.length; i+=3)
+  for(let i = 0; i < url.length; i+=3) {
     blob += url[i];
-
+  }
   token += blob;
-
   // 2. Hash the blob
   var shaObj = new jsSHA("SHA-256", "TEXT");
   shaObj.update(token);
   token = shaObj.getHash("HEX");
-
   // 3. Transmit data
   var data = {"token" : token, "url" : url};
   //////////////////////////////////////////////////////////////////////////////
-
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/get/data/by_token', true);
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var infoResponse = JSON.parse(this.responseText);
-      //console.log(infoResponse);
       if(infoResponse.success==true) {
         document.getElementById("personalInfo").innerHTML = " ";
         for(i in infoResponse) {
@@ -328,6 +310,8 @@ var infoPerso = function(token){
   xhttp.send(JSON.stringify(data));
 };
 
+//---------------------------------------------
+//function to post a message on our own wall
 var postOwnMessage = function(form) {
   var token = this.localStorage.getItem("token");
   var dest = null;
@@ -341,21 +325,17 @@ var postOwnMessage = function(form) {
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
-
-  for(let i = 0; i < message.length; i+=3)
+  for(let i = 0; i < message.length; i+=3) {
     blob += message[i];
-
-  token += blob;
-
+  }
+  var token2 = token + blob;
   // 2. Hash the blob
   var shaObj = new jsSHA("SHA-256", "TEXT");
-  shaObj.update(token);
-  token = shaObj.getHash("HEX");
-
+  shaObj.update(token2);
+  token2 = shaObj.getHash("HEX");
   // 3. Transmit data
-  var data = {'token' : token, 'message' : message, 'email' : dest, 'place' : place};
+  var data = {'token' : token2, 'message' : message, 'email' : dest, 'place' : place};
   //////////////////////////////////////////////////////////////////////////////
-
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/post_message', true);
   xhttp.onreadystatechange = function() {
@@ -376,6 +356,8 @@ var postOwnMessage = function(form) {
   xhttp.send(JSON.stringify(data));
 };
 
+//---------------------------------------------
+//function to post a message on another user's wall
 var postmessageUser = function(form) {
   var token = this.localStorage.getItem("token");
   var dest = searchUser(document.forms["searchuser"]).dest;
@@ -386,34 +368,28 @@ var postmessageUser = function(form) {
   } else {
     place = null;
   }
-
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
-
-  for(let i = 0; i < dest.length; i+=3)
+  for(let i = 0; i < dest.length; i+=3) {
     blob += dest[i];
-
-  for(let i = 0; i < message.length; i+=3)
+  }
+  for(let i = 0; i < message.length; i+=3) {
     blob += message[i];
-
+  }
   token += blob;
-
   // 2. Hash the blob
   var shaObj = new jsSHA("SHA-256", "TEXT");
   shaObj.update(token);
   token = shaObj.getHash("HEX");
-
   // 3. Transmit data
   var data = {'token' : token, 'message' : message, 'email' : dest, 'place' : place};
   //////////////////////////////////////////////////////////////////////////////
-
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/post_message', true);
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var postMessageResponse = JSON.parse(this.responseText);
-      //console.log(postMessageResponse);
       if(postMessageResponse.success==false) {
         document.getElementById("errorPost2").style.display = "block";
         var error = document.createElement('h5');
@@ -429,7 +405,8 @@ var postmessageUser = function(form) {
   xhttp.send(JSON.stringify(data));
 };
 
-
+//---------------------------------------------
+//function to display our own messages on the wall
 var displayOwnMessages = function(token) {
   var url = window.location.href;
   ///////////////////////////// Token protection ///////////////////////////////
@@ -475,34 +452,31 @@ var displayOwnMessages = function(token) {
   xhttp.send(JSON.stringify(data));
 };
 
+//---------------------------------------------
+//function to search another Twidder user (display personal info and messages)
 var searchUser = function(form) {
   var went_well=false;
   var email = form.user.value;
   var token = this.localStorage.getItem("token");
-
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
-  for(let i = 0; i < email.length; i+=3)
+  for(let i = 0; i < email.length; i+=3) {
     blob += email[i];
-
+  }
   token += blob;
-
   // 2. Hash the blob
   var shaObj = new jsSHA("SHA-256", "TEXT");
   shaObj.update(token);
   token = shaObj.getHash("HEX");
-
   // 3. Transmit data
   var data = {"token" : token, "email" : email};
   //////////////////////////////////////////////////////////////////////////////
-
   var xhttp1 = new XMLHttpRequest();
   xhttp1.open("POST", '/get/data/by_email', true);
   xhttp1.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
        var userDataResponse = JSON.parse(this.responseText);
-       //console.log(userDataResponse);
        if(userDataResponse.success==false) {
           went_well=false;
           document.getElementById('errorSearch').innerHTML = " ";
@@ -531,12 +505,15 @@ var searchUser = function(form) {
         xhttp2.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
               var userMessagesResponse = JSON.parse(this.responseText);
-              //console.log(userMessagesResponse);
               for(i in userMessagesResponse) {
                 var writer = userMessagesResponse[i].sender;
                 var content = userMessagesResponse[i].message;
                 var place = userMessagesResponse[i].place;
+                var id = userMessagesResponse[i].id;
                 var aux = document.createElement("li");
+                aux.setAttribute("id", id);
+                aux.setAttribute("draggable", "true");
+                aux.setAttribute("ondragstart", "drag(event)");
                 if (place!=null) {
                   aux.innerHTML = writer + " -- " + place + ":  " + content;
                 } else {
@@ -559,6 +536,8 @@ var searchUser = function(form) {
   }
 };
 
+//---------------------------------------------
+//refresh functions for the buttons
 var refreshOwnWall = function() {
   var token = this.localStorage.getItem("token");
   displayOwnMessages(token);
@@ -568,18 +547,14 @@ var refreshUserWall = function() {
   searchUser(document.forms["searchuser"]);
 };
 
-
+//---------------------------------------------
+//function to check if the user is already connected on an other device/browser
 function checkSocket(token){
   var socket = new WebSocket("ws://localhost:5000/api");
-  // socket.onerror = function(error){
-  //   console.log("WS Error: " + error);
-  // }
   socket.onmessage = function(event){
     if(event.data == "sign_out"){
-      console.log("in the if event loop");
       localStorage.removeItem("token");
       socket.close();
-      // displayView('welcomeview');
       window.onload();
     }
   }
@@ -588,7 +563,8 @@ function checkSocket(token){
   }
 };
 
-
+//---------------------------------------------
+//function to get the geolocation
 function getLocation() {
   var x=document.getElementById("position");
 
@@ -631,7 +607,6 @@ function getLocation() {
         break;
       }
     };
-
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showSimplePosition,showErrorPosition);
     x.innerHTML="Geolocation activated."
@@ -649,7 +624,7 @@ var activateGeoloc = function() {
   }
 };
 
-
+//--------------------------------------------- !!
 //useless
 var resetPswd = function(form){
   email = form.email.value;
@@ -659,7 +634,6 @@ var resetPswd = function(form){
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var resetPswdResponse = JSON.parse(this.responseText);
-      console.log(resetPswdResponse);
       if(resetPswdResponse.success==false) {
         document.getElementById('resetMessage').innerHTML=' ';
         document.getElementById("resetMessage").style.display = "block";
@@ -681,6 +655,8 @@ var resetPswd = function(form){
 };
 
 
+//---------------------------------------------
+//drag and drop functions
 function allowDrop(ev) {
   ev.preventDefault();
 };
@@ -692,7 +668,6 @@ function drag(ev) {
 function drop(ev) {
   ev.preventDefault();
   var message = ev.dataTransfer.getData("text");
-  console.log(message); //the id of the element
   //delete a message
   if (ev.target == document.getElementById("trash")) {
       data = {"id" : message};
@@ -701,7 +676,6 @@ function drop(ev) {
       xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
           var deleteMessResponse = JSON.parse(this.responseText);
-          console.log(deleteMessResponse);
           if(deleteMessResponse.success==false) {  //error
             document.getElementById('deleteMessage').innerHTML=' ';
             document.getElementById("deleteMessage").style.display = "block";
@@ -709,13 +683,12 @@ function drop(ev) {
             error.innerHTML = deleteMessResponse.message;
             document.getElementById("deleteMessage").appendChild(error);
           } else {
-            ev.target.appendChild(document.getElementById(message)); //here ??
+            ev.target.appendChild(document.getElementById(message));
           }
         }
       }
       xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
       xhttp.send(JSON.stringify(data));
-
   //drag and drop a message into the textarea
   } else {
     //create a clone of the message -> doesn't work
@@ -724,3 +697,5 @@ function drop(ev) {
     ev.target.appendChild(clone);
   }
 };
+
+//---------------------------------------------
