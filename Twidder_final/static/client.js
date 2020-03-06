@@ -67,6 +67,7 @@ checkSignup = function(form) {
         var signUpResponse = JSON.parse(this.responseText);
         //console.log(signUpResponse);
         if(signUpResponse.success==false) {
+          document.getElementById("errorSignup").innerHTML = "";
           document.getElementById("errorSignup").style.display = "block";
           document.getElementById("okSignup").style.display = "none";
           document.getElementById("wrongLength1").style.display = "none";
@@ -75,6 +76,7 @@ checkSignup = function(form) {
           error.innerHTML = signUpResponse.message;
           document.getElementById("errorSignup").appendChild(error);
         } else {
+          document.getElementById("errorSignup").innerHTML = "";
           document.getElementById("wrongSame1").style.display = "none";
           document.getElementById("errorSignup").style.display = "none";
           document.getElementById("wrongLength1").style.display = "none";
@@ -433,8 +435,9 @@ var displayOwnMessages = function(token) {
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
-  for(let i = 0; i < url.length; i+=3)
+  for(let i = 0; i < url.length; i+=3) {
     blob += url[i];
+  }
 
   token += blob;
 

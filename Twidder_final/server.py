@@ -57,22 +57,16 @@ def sign_in():
     data = request.get_json()
     email = data['email']
     inputed_password = data['password']
-
     ########################### Password validation ############################
     # 1. Retrive user's salt from the database
     authentication_data = database_helper.get_users_salt(email)
-
     # 2. Append salt to the inputed password
     inputed_password = inputed_password + authentication_data['salt']
-
-
     # 3. Compare the hash generated from the inputed password with the one in
     #    the database
     boolean_success = False
     if(bcrypt.check_password_hash(authentication_data['password'], inputed_password)):
         boolean_success = True
-
-
     ############################################################################
     if boolean_success == True:
         token = secrets.token_hex(16)
@@ -85,6 +79,7 @@ def sign_in():
         return jsonify({'success' : False, 'message' : "Wrong user or wrong password"})
     return None
 
+
 @app.route('/sign_up', methods = ['POST'])
 def sign_up():
     data = request.get_json()
@@ -96,14 +91,12 @@ def sign_up():
         # 1. Generate salt
         salt = os.urandom(32)
         salt = (binascii.hexlify(salt)).decode('utf-8')
-
         # 2. Append salt to the password
         password = data['password']
         password = password + salt
         # 3. Hash the password and storing
         password = bcrypt.generate_password_hash(password).decode('utf-8')
         output_msg = database_helper.save_new_user(data['email'], password, data['firstname'], data['familyname'], data['gender'], data['city'], data['country'], salt)
-
         ########################################################################
 
         if output_msg:
@@ -540,13 +533,16 @@ def resetPswd() :
             secrets.SystemRandom().shuffle(char_list)
             password = ''.join(char_list)
             print ("New secure Password is ", password)
-
-            #upload the database with the new password# 
+            ######################## New password hashing ##########################
+            # 1. Find the salt
             resultSalt= database_helper.get_users_salt(emailDest)
             salt = resultSalt['salt']
-            print(salt)
-            password_changed = database_helper.change_password(emailDest, password, salt)
-            #password_changed = True
+            # 2. Append salt to the password
+            passwordSecure = password + salt
+            # 3. Hash the password and storing
+            passwordSecure = bcrypt.generate_password_hash(passwordSecure).decode('utf-8')
+            password_changed = database_helper.change_password(emailDest, passwordSecure, salt)
+            ########################################################################
             if password_changed:
                 #send the email#
                 message = """\
@@ -564,11 +560,10 @@ The Twidder team"""
                     server = smtplib.SMTP('smtp.gmail.com', 587)
                     server.starttls() #enable security
                     server.login ('noreply.twidder.liu@gmail.com', 'liuTDDD97!')  #login and pswd of the email account
-                    # Dump communication with the receiving server straight to to the console.
-                    server.set_debuglevel(True)
+                    server.set_debuglevel(True) # Dump communication with the receiving server straight to to the console.
                     server.sendmail('noreply.twidder.liu@gmail.com', [emailDest], msg.as_string())
                     flash("An email has been sending to you.", 'success')
-                    print('boolean_success')
+                    print('success')
                     #return redirect(url_for('root'))
                 except smtplib.SMTPException:
                     print('error')
