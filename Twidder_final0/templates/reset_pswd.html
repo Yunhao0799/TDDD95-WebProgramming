@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Twidder</title>
+    <link href="/static/client.css" type="text/css" rel="stylesheet">
+    <script src="/static/client.js" type="text/javascript"></script>
+    </head>
+
+    <div class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class=flashes>
+          {% for category, message in messages %}
+            <li class="{{ category }} alert-dismissible">
+              <a href="/reset_password" class="close" data-dismiss="alert" aria-label="close" style="text-decoration:none">&times;</a>
+              {{ message }}
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
+      <div class="conteneur_client">
+        <h4>Reset your password:</h4>
+        <form action="{{ url_for('resetPswd') }}" method="POST">
+          {{ form.csrf_token }}
+          <dl>
+            <label>Your email: </label>
+            {{ form.email(size=20, placeholder="email@email.com") }}
+          </dl>
+          <button class="submit" type="submit">Send Email</button>
+        </form>
+        <br/>
+        <a href="/"><button type="button" name="button" class="logOutButton">Go back to the welcome page</button></a>
+      </div>
+
+    </div>
