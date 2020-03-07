@@ -625,7 +625,6 @@ var activateGeoloc = function() {
 };
 
 //--------------------------------------------- !!
-//useless
 var resetPswd = function(form){
   email = form.email.value;
   data = {"email" : email};

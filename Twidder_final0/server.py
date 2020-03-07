@@ -472,58 +472,57 @@ class EmailForm(Form):
 
 @app.route('/reset_password', methods = ['GET', 'POST'])
 def resetPswd() :
-    form = EmailForm()
-    if form.validate_on_submit():
-        emailDest = form.email.data
-        if database_helper.check_if_email_exists(emailDest):
-            #create a new secure password#
-            stringSource  = string.ascii_letters + string.digits + string.punctuation
-            password = secrets.choice(string.ascii_lowercase)
-            password += secrets.choice(string.ascii_uppercase)
-            password += secrets.choice(string.digits)
-            for i in range(6):
-                password += secrets.choice(stringSource)
-            char_list = list(password)
-            secrets.SystemRandom().shuffle(char_list)
-            password = ''.join(char_list)
-            ######################## New password hashing ##########################
-            # 1. Find the salt
-            resultSalt= database_helper.get_users_salt(emailDest)
-            salt = resultSalt['salt']
-            # 2. Append salt to the password
-            passwordSecure = password + salt
-            # 3. Hash the password and storing
-            passwordSecure = bcrypt.generate_password_hash(passwordSecure).decode('utf-8')
-            password_changed = database_helper.change_password(emailDest, passwordSecure, salt)
-            ########################################################################
-            if password_changed:
-                message = """\
+    data = request.get_json()
+    emailDest = data['email']
+    if database_helper.check_if_email_exists(emailDest):
+        #create a new secure password#
+        stringSource  = string.ascii_letters + string.digits + string.punctuation
+        password = secrets.choice(string.ascii_lowercase)
+        password += secrets.choice(string.ascii_uppercase)
+        password += secrets.choice(string.digits)
+        for i in range(6):
+            password += secrets.choice(stringSource)
+        char_list = list(password)
+        secrets.SystemRandom().shuffle(char_list)
+        password = ''.join(char_list)
+        ######################## New password hashing ##########################
+        # 1. Find the salt
+        resultSalt= database_helper.get_users_salt(emailDest)
+        salt = resultSalt['salt']
+        # 2. Append salt to the password
+        passwordSecure = password + salt
+        # 3. Hash the password and storing
+        passwordSecure = bcrypt.generate_password_hash(passwordSecure).decode('utf-8')
+        password_changed = database_helper.change_password(emailDest, passwordSecure, salt)
+        ########################################################################
+        if password_changed:
+            message = """\
 Dear user,
 Your new password is : """+ password +"""
 
 The Twidder team"""
-                msg = MIMEText(message)
-                msg['To'] = email.utils.formataddr((emailDest, emailDest))
-                msg['From'] = email.utils.formataddr(('Twidder team', 'noreply.twidder.liu@gmail.com'))
-                msg['Subject'] = 'New Twidder password'
-                try:
-                    # --- send the email ---
-                    server = smtplib.SMTP('smtp.gmail.com', 587)
-                    server.starttls() #enable security
-                    server.login ('noreply.twidder.liu@gmail.com', 'liuTDDD97!')  #login and pswd of the email account
-                    server.set_debuglevel(True) # Dump communication with the receiving server straight to the console.
-                    server.sendmail('noreply.twidder.liu@gmail.com', [emailDest], msg.as_string())
-                    flash("An email has been sending to you.", 'success')
-                    #return redirect(url_for('root'))
-                except smtplib.SMTPException:
-                    flash("Error: unable to send email", 'error')
-                finally:
-                    server.quit()
-            else:
-                flash("Something went wrong changing the password", 'error')
-        else :
-            flash("Your email does not exist in our database.", 'error')
-    return render_template('reset_pswd.html', form=form)
+            msg = MIMEText(message)
+            msg['To'] = email.utils.formataddr((emailDest, emailDest))
+            msg['From'] = email.utils.formataddr(('Twidder team', 'noreply.twidder.liu@gmail.com'))
+            msg['Subject'] = 'New Twidder password'
+            try:
+                # --- send the email ---
+                server = smtplib.SMTP('smtp.gmail.com', 587)
+                server.starttls() #enable security
+                server.login ('noreply.twidder.liu@gmail.com', 'liuTDDD97!')  #login and pswd of the email account
+                server.set_debuglevel(True) # Dump communication with the receiving server straight to the console.
+                server.sendmail('noreply.twidder.liu@gmail.com', [emailDest], msg.as_string())
+                server.quit()
+                return jsonify({'success' : True, 'message' : "Password resetting"})
+                #return redirect(url_for('root'))
+            except smtplib.SMTPException:
+                server.quit()
+                return jsonify({'success' : False, 'message' : "Error: unable to send email"})
+
+        else:
+            return jsonify({'success' : False, 'message' : "Something went wrong changing the password"})
+    else :
+        return jsonify({'success' : False, 'message' : "Your email does not exist in our database."})
 
 
 
