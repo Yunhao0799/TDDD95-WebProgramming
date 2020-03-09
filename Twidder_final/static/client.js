@@ -180,6 +180,8 @@ var changePswd = function(form){
   };
   if(samePwd(newPswd, newPswd2) && goodLength(newPswd)) {
     var xhttp = new XMLHttpRequest();
+    var publicKey = this.localStorage.getItem("email");
+
     ///////////////////////////// Token protection /////////////////////////////
     // 1. Create blob
     var blob = "";
@@ -195,7 +197,7 @@ var changePswd = function(form){
     shaObj.update(token);
     token = shaObj.getHash("HEX");
     // 3. Transmit data
-    var data = {"token" : token, "old_password" : oldPswd, "new_password" : newPswd};
+    var data = {"token" : token, "old_password" : oldPswd, "new_password" : newPswd, "publicKey" : publicKey};
     ////////////////////////////////////////////////////////////////////////////
     xhttp.open("POST", '/change_password', true);
     xhttp.onreadystatechange = function() {

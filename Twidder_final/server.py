@@ -175,7 +175,7 @@ def change_password():
         # 3. Compare the two hashes
         if token == hash:
             equal_hashed_token = True
-            print("Equal hashes sign_out")
+            print("Equal hashes change_password")
         print(equal_hashed_token)
         ########################################################################
         if equal_hashed_token:
