@@ -624,37 +624,6 @@ var activateGeoloc = function() {
   }
 };
 
-//--------------------------------------------- !!
-//useless
-var resetPswd = function(form){
-  email = form.email.value;
-  data = {"email" : email};
-  var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", '/reset_password', true);
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      var resetPswdResponse = JSON.parse(this.responseText);
-      if(resetPswdResponse.success==false) {
-        document.getElementById('resetMessage').innerHTML=' ';
-        document.getElementById("resetMessage").style.display = "block";
-        var error = document.createElement('h5');
-        error.innerHTML = resetPswdResponse.message;
-        document.getElementById("resetMessage").appendChild(error);
-      } else {
-        document.getElementById('resetMessage').innerHTML=' ';
-        document.getElementById("resetMessage").style.display = "block";
-        var success = document.createElement('h4');
-        success.innerHTML = resetPswdResponse.message;
-        document.getElementById("resetMessage").appendChild(success);
-        document.forms['resetPswd'].reset();
-      }
-    }
-  }
-  xhttp.setRequestHeader("content-type", "application/json; charset=utf-8");
-  xhttp.send(JSON.stringify(data));
-};
-
-
 //---------------------------------------------
 //drag and drop functions
 function allowDrop(ev) {

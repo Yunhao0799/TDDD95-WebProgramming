@@ -26,10 +26,7 @@ import hashlib
 import smtplib
 import email.utils
 from email.mime.text import MIMEText
-#manage a form
-from flask_wtf import Form
-from wtforms import StringField
-from wtforms.validators import DataRequired, Email, Length
+
 
 socketsTab = {}
 
@@ -464,12 +461,6 @@ def delete_message():
 
 
 #Reset your password
-
-#create a new form to enter the email
-class EmailForm(Form):
-    email = StringField('Email', validators=[DataRequired(), Email(), Length(min=6, max=60)])
-
-
 @app.route('/reset_password', methods = ['GET', 'POST'])
 def resetPswd() :
     data = request.get_json()
@@ -513,7 +504,7 @@ The Twidder team"""
                 server.set_debuglevel(True) # Dump communication with the receiving server straight to the console.
                 server.sendmail('noreply.twidder.liu@gmail.com', [emailDest], msg.as_string())
                 server.quit()
-                return jsonify({'success' : True, 'message' : "Password resetting"})
+                return jsonify({'success' : True, 'message' : "An email has been sending to you."})
                 #return redirect(url_for('root'))
             except smtplib.SMTPException:
                 server.quit()
