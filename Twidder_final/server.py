@@ -111,7 +111,8 @@ def sign_out(token = None):
     if token==None:
         return jsonify({'success' : False, 'message' : "You are not signed in."})
     url = data['url']
-    authentication_data = database_helper.get_email_logged_user()
+    public_key = data['publicKey']
+    authentication_data = database_helper.get_email_logged_user_new(public_key)
     stored_token = authentication_data['token']
     equal_hashed_token = False
     ########################## Token verification ##########################
@@ -147,9 +148,11 @@ def change_password():
     old_password = data['old_password']
     new_password = data['new_password']
     if token != None:
-        loggedUserData = database_helper.get_email_logged_user()
+        public_key = data['publicKey']
+        loggedUserData = database_helper.get_email_logged_user_new(public_key)
         email = loggedUserData['email']
         stored_token = loggedUserData['token']
+
         equal_hashed_token = False
         ########################## Token verification ##########################
         # 1. Recreate the blob using the stored token
@@ -219,7 +222,8 @@ def get_user_data_by_token():
     token = data['token']
     if token != None:
         url = data['url']
-        authentication_data = database_helper.get_email_logged_user()
+        public_key = data['publicKey']
+        authentication_data = database_helper.get_email_logged_user_new(public_key)
         stored_token = authentication_data['token']
         equal_hashed_token = False
         ########################## Token verification ##########################
@@ -254,7 +258,8 @@ def get_user_data_by_email():
     data = request.get_json()
     token = data['token']
     email = data['email']
-    authentication_data = database_helper.get_email_logged_user()
+    public_key = data['publicKey']
+    authentication_data = database_helper.get_email_logged_user_new(public_key)
     stored_token = authentication_data['token']
     equal_hashed_token = False
     ########################## Token verification ##########################
@@ -294,7 +299,8 @@ def get_user_messages_by_token():
     token = data['token']
     if token != None:
         url = data['url']
-        authentication_data = database_helper.get_email_logged_user()
+        public_key = data['publicKey']
+        authentication_data = database_helper.get_email_logged_user_new(public_key)
         stored_token = authentication_data['token']
         equal_hashed_token = False
         ########################## Token verification ##########################
@@ -330,7 +336,8 @@ def get_user_messages_by_email():
     token = data['token']
     email = data['email']
     if token != None:
-        authentication_data = database_helper.get_email_logged_user()
+        public_key = data['publicKey']
+        authentication_data = database_helper.get_email_logged_user_new(public_key)
         stored_token = authentication_data['token']
         equal_hashed_token = False
         ########################## Token verification ##########################
@@ -371,7 +378,8 @@ def post_message():
     message = data['message']
     dest_email = data['email']
     place = data['place']
-    authentication_data = database_helper.get_email_logged_user()
+    public_key = data['publicKey']
+    authentication_data = database_helper.get_email_logged_user_new(public_key)
     stored_token = authentication_data['token']
     sender_mail = database_helper.get_email_by_token(stored_token)
     sender_mail = sender_mail[0]

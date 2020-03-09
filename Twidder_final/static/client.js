@@ -107,6 +107,7 @@ checkSignIn = function(form){
     var signInResponse = JSON.parse(this.responseText);
     if (signInResponse.success == true) {
       localStorage.setItem("token", signInResponse.message);
+      localStorage.setItem("email", user);
       return window.onload();
     } else {
       document.getElementById('errorSignin').innerHTML = " ";
@@ -228,6 +229,7 @@ var changePswd = function(form){
 //log out function
 var logOut = function() {
   var token = this.localStorage.getItem("token");
+  var publicKey = this.localStorage.getItem("email");
   var url = window.location.href;
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
@@ -241,7 +243,7 @@ var logOut = function() {
   shaObj.update(token);
   token = shaObj.getHash("HEX");
   // 3. Transmit data
-  var data = {"token" : token, "url" : url};
+  var data = {"token" : token, "url" : url, "publicKey" : publicKey};
   //////////////////////////////////////////////////////////////////////////////
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/sign_out', true);
@@ -268,6 +270,8 @@ var logOut = function() {
 //function to display our own personal information
 var infoPerso = function(token){
   var url = window.location.href;
+  var publicKey = this.localStorage.getItem("email");
+
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
@@ -280,7 +284,7 @@ var infoPerso = function(token){
   shaObj.update(token);
   token = shaObj.getHash("HEX");
   // 3. Transmit data
-  var data = {"token" : token, "url" : url};
+  var data = {"token" : token, "url" : url, "publicKey" : publicKey};
   //////////////////////////////////////////////////////////////////////////////
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/get/data/by_token', true);
@@ -322,6 +326,9 @@ var postOwnMessage = function(form) {
   } else {
     place = null;
   }
+
+  var publicKey = this.localStorage.getItem("email");
+
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
@@ -334,7 +341,7 @@ var postOwnMessage = function(form) {
   shaObj.update(token2);
   token2 = shaObj.getHash("HEX");
   // 3. Transmit data
-  var data = {'token' : token2, 'message' : message, 'email' : dest, 'place' : place};
+  var data = {'token' : token2, 'message' : message, 'email' : dest, 'place' : place, "publicKey" : publicKey};
   //////////////////////////////////////////////////////////////////////////////
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/post_message', true);
@@ -368,6 +375,8 @@ var postmessageUser = function(form) {
   } else {
     place = null;
   }
+  var publicKey = this.localStorage.getItem("email");
+
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
@@ -383,7 +392,7 @@ var postmessageUser = function(form) {
   shaObj.update(token);
   token = shaObj.getHash("HEX");
   // 3. Transmit data
-  var data = {'token' : token, 'message' : message, 'email' : dest, 'place' : place};
+  var data = {'token' : token, 'message' : message, 'email' : dest, 'place' : place, 'publicKey' : publicKey};
   //////////////////////////////////////////////////////////////////////////////
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", '/post_message', true);
@@ -409,6 +418,8 @@ var postmessageUser = function(form) {
 //function to display our own messages on the wall
 var displayOwnMessages = function(token) {
   var url = window.location.href;
+  var publicKey = this.localStorage.getItem("email");
+
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
@@ -421,7 +432,7 @@ var displayOwnMessages = function(token) {
   shaObj.update(token);
   token = shaObj.getHash("HEX");
   // 3. Transmit data
-  var data = {"token" : token, "url" : url};
+  var data = {"token" : token, "url" : url, "publicKey" : publicKey};
   //////////////////////////////////////////////////////////////////////////////
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", 'get/messages/by_token', true);
@@ -458,6 +469,8 @@ var searchUser = function(form) {
   var went_well=false;
   var email = form.user.value;
   var token = this.localStorage.getItem("token");
+  var publicKey = this.localStorage.getItem("email");
+
   ///////////////////////////// Token protection ///////////////////////////////
   // 1. Create blob
   var blob = "";
@@ -470,7 +483,7 @@ var searchUser = function(form) {
   shaObj.update(token);
   token = shaObj.getHash("HEX");
   // 3. Transmit data
-  var data = {"token" : token, "email" : email};
+  var data = {"token" : token, "email" : email, "publicKey" : publicKey};
   //////////////////////////////////////////////////////////////////////////////
   var xhttp1 = new XMLHttpRequest();
   xhttp1.open("POST", '/get/data/by_email', true);

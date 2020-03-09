@@ -190,3 +190,14 @@ def get_email_logged_user():
             data = {"email" : rows[0][0], "token" : rows[0][1]}
 
             return data
+
+def get_email_logged_user_new(email):
+        cursor = get_db().execute('select * from loggedUser where email=?', [email])
+        rows = cursor.fetchall()
+        cursor.close()
+        if rows==[]:
+            return None
+        else:
+            data = {"email" : rows[0][0], "token" : rows[0][1]}
+
+            return data
