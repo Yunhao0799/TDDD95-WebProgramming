@@ -439,7 +439,12 @@ def api():
     return "End if api"
 
 
-
+################################################################################
+#                            Geolocation                                       #
+#   Descrip: Function that gets current location                               #
+#   Return: json with information related to the inputted                      #
+#           latitude and longitude                                             #
+################################################################################
 @app.route('/get/position', methods = ['POST'])
 def getPosition():
     data = request.get_json()
@@ -463,13 +468,17 @@ def delete_message():
 
 
 
-#Reset your password
+
 
 #create a new form to enter the email
 class EmailForm(Form):
     email = StringField('Email', validators=[DataRequired(), Email(), Length(min=6, max=60)])
 
 
+################################################################################
+#                            Password reset                                    #
+#   Descrip: password reset using email recovery                               #
+################################################################################
 @app.route('/reset_password', methods = ['GET', 'POST'])
 def resetPswd() :
     form = EmailForm()
@@ -529,6 +538,6 @@ The Twidder team"""
 
 #######Run the server#######
 if __name__ == '__main__':
-    print("http://localhost:5000/")
+    print("Server iniciated with url: \n\thttp://localhost:5000/\n")
     http_server = WSGIServer(('',5000), app, handler_class=WebSocketHandler)
     http_server.serve_forever()
