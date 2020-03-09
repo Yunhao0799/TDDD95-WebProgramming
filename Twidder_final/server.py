@@ -14,12 +14,13 @@ import requests
 import string
 # module secrets used for generate token
 import secrets
-#module flask_bcrypt for hashing purposes
+# module flask_bcrypt for hashing purposes
 from flask_bcrypt import Bcrypt
 #modele os used by os.urandom
 import os
-#module binascii needed for the function binascii.hexlify()
+# module binascii needed for the function binascii.hexlify()
 import binascii
+# module hashlib needed for token verification part(hash comparations)
 import hashlib
 
 # module to send Email
@@ -442,7 +443,8 @@ def api():
 ################################################################################
 #                            Geolocation                                       #
 #   Descrip: Function that gets current location                               #
-#   Return: json with information related to the inputted                      #
+#   Input  : latitude and longitude                                            #
+#   Return : json with information related to the inputted                     #
 #           latitude and longitude                                             #
 ################################################################################
 @app.route('/get/position', methods = ['POST'])
@@ -455,7 +457,12 @@ def getPosition():
     return json
 
 
-
+################################################################################
+#                            Delete message                                    #
+#   Descrip: Delete the message by given message ID                            #
+#   Input  : Message ID                                                        #
+#   Return : json with the success of the operation                            #
+################################################################################
 @app.route('/delete_message', methods = ['POST'])
 def delete_message():
     data = request.get_json()
