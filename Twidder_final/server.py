@@ -545,6 +545,6 @@ The Twidder team"""
 
 #######Run the server#######
 if __name__ == '__main__':
-    print("Server iniciated with url: \n\thttp://localhost:5000/\n")
+    print("Server initiated with url: \n\thttp://localhost:5000/\n")
     http_server = WSGIServer(('',5000), app, handler_class=WebSocketHandler)
     http_server.serve_forever()
